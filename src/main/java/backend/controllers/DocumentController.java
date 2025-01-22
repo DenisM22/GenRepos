@@ -1,10 +1,7 @@
 package backend.controllers;
 
 import backend.models.Document;
-import backend.models.Person;
 import backend.services.DocumentService;
-import backend.services.PersonService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

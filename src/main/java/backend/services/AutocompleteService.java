@@ -37,5 +37,4 @@ public class AutocompleteService {
         return list.stream().map(Place::getPlace).toList();
     }
 
-
 }

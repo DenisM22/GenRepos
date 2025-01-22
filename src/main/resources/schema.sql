@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS first_names (
 CREATE TABLE IF NOT EXISTS aliases (
     id SERIAL PRIMARY KEY,
     alias VARCHAR(255) NOT NULL UNIQUE,
-    first_name INT REFERENCES first_names(id),
+    first_name INT REFERENCES first_names(id)
     );
 
 
@@ -76,11 +76,16 @@ CREATE TABLE IF NOT EXISTS people (
     death_date INT REFERENCES fuzzy_dates(id),
     place INT REFERENCES places(id),
     social_status INT REFERENCES social_statuses(id),
-    spouse_id BIGINT REFERENCES persons(id),
-    father_id BIGINT REFERENCES persons(id),
-    mother_id BIGINT REFERENCES persons(id),
-    children_id BIGINT[] REFERENCES persons(id)
+    spouse_id BIGINT REFERENCES people(id),
+    father_id BIGINT REFERENCES people(id),
+    mother_id BIGINT REFERENCES people(id)
     );
+
+CREATE TABLE IF NOT EXISTS parents_children (
+    parent_id BIGINT REFERENCES people(id) ON DELETE CASCADE,
+    child_id BIGINT REFERENCES people(id) ON DELETE CASCADE,
+    PRIMARY KEY (parent_id, child_id)
+);
 
 CREATE TABLE IF NOT EXISTS documents (
     id BIGSERIAL PRIMARY KEY,
@@ -103,3 +108,7 @@ CREATE TABLE IF NOT EXISTS people_from_documents (
     social_status INT REFERENCES social_statuses(id),
     family_status INT REFERENCES family_statuses(id)
     );
+
+-- \COPY first_names(first_name) FROM 'C:/Users/denis/Downloads/first_names.csv' DELIMITER ',' CSV ENCODING 'UTF8';
+
+

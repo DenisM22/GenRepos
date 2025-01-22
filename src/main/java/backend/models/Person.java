@@ -58,9 +58,9 @@ public class Person {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "person_children",
+            name = "parents_children",
             joinColumns = @JoinColumn(name = "parent_id"),
-            inverseJoinColumns = @JoinColumn(name = "children_id"))
+            inverseJoinColumns = @JoinColumn(name = "child_id"))
     private List<Person> children;
 
 }

@@ -8,6 +8,10 @@ CREATE TABLE IF NOT EXISTS users (
 --
 -- Справочники
 --
+-- \COPY first_names(first_name) FROM 'C:/Users/denis/Downloads/first_names.csv' DELIMITER ',' CSV ENCODING 'UTF8';
+-- \COPY last_names(last_name) FROM 'C:/Users/denis/Downloads/last_names.csv' DELIMITER ',' CSV ENCODING 'UTF8';
+-- \COPY middle_names(middle_name) FROM 'C:/Users/denis/Downloads/middle_names.csv' DELIMITER ',' CSV ENCODING 'UTF8';
+--
 CREATE TABLE IF NOT EXISTS first_names (
     id SERIAL PRIMARY KEY,
     first_name VARCHAR(255) NOT NULL UNIQUE
@@ -108,7 +112,3 @@ CREATE TABLE IF NOT EXISTS people_from_documents (
     social_status INT REFERENCES social_statuses(id),
     family_status INT REFERENCES family_statuses(id)
     );
-
--- \COPY first_names(first_name) FROM 'C:/Users/denis/Downloads/first_names.csv' DELIMITER ',' CSV ENCODING 'UTF8';
-
-

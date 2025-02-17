@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS parents_children (
     parent_id BIGINT REFERENCES people(id) ON DELETE CASCADE,
     child_id BIGINT REFERENCES people(id) ON DELETE CASCADE,
     PRIMARY KEY (parent_id, child_id)
-);
+    );
 
 CREATE TABLE IF NOT EXISTS documents (
     id BIGSERIAL PRIMARY KEY,
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS documents (
     parish VARCHAR(255),
     place VARCHAR(255),
     household VARCHAR(255),
-    image BYTEA
+    image VARCHAR
     );
 
 CREATE TABLE IF NOT EXISTS people_from_documents (

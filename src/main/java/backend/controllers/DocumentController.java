@@ -31,9 +31,15 @@ public class DocumentController {
 
     @PostMapping("/save")
     public ResponseEntity<?> saveDocument(@RequestBody Document document) {
-        log.info("Отправлен запрос на сохранение документа");
-        documentService.saveDocument(document);
-        return ResponseEntity.ok().build();
+        try {
+            log.info("Отправлен запрос на сохранение документа");
+            documentService.saveDocument(document);
+            return ResponseEntity.ok().build();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 }

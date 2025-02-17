@@ -31,9 +31,8 @@ public class Document {
     @Column(name = "household")
     private String household;
 
-    @Lob
-    @Column(name = "image", columnDefinition = "BYTEA")
-    private byte[] image;
+    @Column(name = "image")
+    private String image;
 
     @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PersonFromDocument> people;

@@ -13,10 +13,6 @@ import java.util.List;
 public class FirstName {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "first_name", nullable = false, unique = true)
     private String firstName;
 
     @OneToMany(mappedBy = "firstName", cascade = CascadeType.ALL, orphanRemoval = true)

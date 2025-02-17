@@ -18,17 +18,14 @@ public class PersonFromDocument {
     @JoinColumn(name = "document_id", nullable = false)
     private Document document;
 
-    @ManyToOne
-    @JoinColumn(name = "first_name", nullable = false)
-    private FirstName firstName;
+    @Column(name = "first_name")
+    private String firstName;
 
-    @ManyToOne
-    @JoinColumn(name = "last_name")
-    private LastName lastName;
+    @Column(name = "last_name")
+    private String lastName;
 
-    @ManyToOne
-    @JoinColumn(name = "middle_name")
-    private MiddleName middleName;
+    @Column(name = "middle_name")
+    private String middleName;
 
     @ManyToOne
     @JoinColumn(name = "birth_date")
@@ -38,12 +35,10 @@ public class PersonFromDocument {
     @JoinColumn(name = "death_date")
     private FuzzyDate deathDate;
 
-    @ManyToOne
-    @JoinColumn(name = "social_status")
-    private SocialStatus socialStatus;
+    @Column(name = "social_status")
+    private String socialStatus;
 
-    @ManyToOne
-    @JoinColumn(name = "family_status")
-    private FamilyStatus familyStatus;
+    @Column(name = "family_status")
+    private String familyStatus;
 
 }

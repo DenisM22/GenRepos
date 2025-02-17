@@ -14,7 +14,7 @@ export default function DocumentSearch() {
     const [message, setMessage] = useState('')
     const [documents, setDocuments] = useState<Document[]>([])
     const [searchTerm, setSearchTerm] = useState("")
-    const debouncedSearchTerm = useDebounce(searchTerm, 500)
+    const debouncedSearchTerm = useDebounce(searchTerm, 300)
 
     const fetchDocuments = async () => {
         try {
@@ -54,7 +54,6 @@ export default function DocumentSearch() {
             </form>
 
             {message && <p className="mt-4 text-center text-red-500">{message}</p>}
-
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {documents.map((doc) => (
                     <Card key={doc.id} className="card-hover">
@@ -72,4 +71,3 @@ export default function DocumentSearch() {
         </div>
     )
 }
-

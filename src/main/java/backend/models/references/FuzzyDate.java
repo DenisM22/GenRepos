@@ -1,9 +1,10 @@
 package backend.models.references;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "fuzzy_dates")
@@ -16,13 +17,13 @@ public class FuzzyDate {
     private Long id;
 
     @Column(name = "exact_date")
-    private Date exactDate;
+    private LocalDate exactDate;
 
     @Column(name = "start_date")
-    private Date startDate;
+    private LocalDate startDate;
 
     @Column(name = "end_date")
-    private Date endDate;
+    private LocalDate endDate;
 
     @Column(name = "description")
     private String description;

@@ -10,10 +10,6 @@ import lombok.*;
 public class Place {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "place", nullable = false, unique = true)
     private String place;
 
 }

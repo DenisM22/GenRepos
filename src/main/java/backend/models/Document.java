@@ -22,19 +22,17 @@ public class Document {
     @Column(name = "year_of_creation")
     private Short yearOfCreation;
 
-    @ManyToOne
-    @JoinColumn(name = "parish")
-    private Parish parish;
+    @Column(name = "parish")
+    private String parish;
 
-    @ManyToOne
-    @JoinColumn(name = "place")
-    private Place place;
+    @Column(name = "place")
+    private String place;
 
     @Column(name = "household")
     private String household;
 
     @Lob
-    @Column(name = "image")
+    @Column(name = "image", columnDefinition = "BYTEA")
     private byte[] image;
 
     @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true)

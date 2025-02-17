@@ -1,5 +1,5 @@
 export interface Document {
-  id: number
+  id?: number
   title?: string
   yearOfCreation?: number
   parish?: string
@@ -10,19 +10,19 @@ export interface Document {
 }
 
 export interface PersonFromDocument {
-  id: number
+  id?: number
   document?: Document
   firstName?: string
   lastName?: string
   middleName?: string
-  birthDate?: string
-  deathDate?: string
+  birthDate?: FuzzyDate
+  deathDate?: FuzzyDate
   socialStatus?: string
   familyStatus?: string
 }
 
 export interface Person {
-  id: number
+  id?: number
   firstName?: string
   lastName?: string
   middleName?: string
@@ -37,7 +37,7 @@ export interface Person {
 }
 
 export interface FuzzyDate {
-  id: number
+  id?: number
   exactDate?: string
   startDate?: string
   endDate?: string

@@ -17,9 +17,9 @@ public class AutocompleteService {
     private final MiddleNameRepository middleNameRepository;
     private final PlaceRepository placeRepository;
 
-    public List<FirstName> getFirstNamesWith(String str) { //TODO добавить синонимы
+    public List<String> getFirstNamesWith(String str) { //TODO добавить синонимы
         List<FirstName> list = firstNameRepository.findAllByFirstNameStartingWithIgnoreCase(str);
-        return list;
+        return list.stream().map(FirstName::getFirstName).toList();
     }
 
     public List<String> getLastNamesWith(String str) {

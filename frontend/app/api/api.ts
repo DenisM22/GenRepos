@@ -28,5 +28,5 @@ export const autocompleteApi = {
   getFirstNames: (str: string) => api.get(`/autocomplete/first-names`, { params: { str } }),
   getLastNames: (str: string) => api.get(`/autocomplete/last-names`, { params: { str } }),
   getMiddleNames: (str: string) => api.get(`/autocomplete/middle-names`, { params: { str } }),
+  getPlaces: (str: string) => api.get(`/autocomplete/places`, { params: { str } })
 }
-

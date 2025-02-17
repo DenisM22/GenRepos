@@ -6,8 +6,7 @@ export default function Home() {
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] space-y-8 text-center">
       <h1 className="text-5xl font-bold text-primary">Добро пожаловать в Генеалогический сервис</h1>
       <p className="text-xl text-muted-foreground max-w-2xl">
-        Исследуйте свою семейную историю, открывайте новые связи и сохраняйте важные документы с помощью нашего
-        инновационного сервиса.
+        Исследуйте свою семейную историю, открывайте новые связи и сохраняйте важные документы с помощью нашего сервиса.
       </p>
       <div className="flex space-x-4">
         <Link href="/documents">
@@ -24,4 +23,3 @@ export default function Home() {
     </div>
   )
 }
-

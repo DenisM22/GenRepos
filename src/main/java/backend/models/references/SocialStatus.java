@@ -10,10 +10,6 @@ import lombok.*;
 public class SocialStatus {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "social_status", nullable = false, unique = true)
     private String socialStatus;
 
 }

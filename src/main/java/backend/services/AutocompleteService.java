@@ -16,6 +16,7 @@ public class AutocompleteService {
     private final LastNameRepository lastNameRepository;
     private final MiddleNameRepository middleNameRepository;
     private final PlaceRepository placeRepository;
+    private final ParishRepository parishRepository;
 
     public List<String> getFirstNamesWith(String str) { //TODO добавить синонимы
         List<FirstName> list = firstNameRepository.findAllByFirstNameStartingWithIgnoreCase(str);
@@ -30,6 +31,11 @@ public class AutocompleteService {
     public List<String> getMiddleNamesWith(String str) {
         List<MiddleName> list = middleNameRepository.findAllByMiddleNameStartingWithIgnoreCase(str);
         return list.stream().map(MiddleName::getMiddleName).toList();
+    }
+
+    public List<String> getParishesWith(String str) {
+        List<Place> list = parishRepository.findAllByParishStartingWithIgnoreCase(str);
+        return list.stream().map(Place::getPlace).toList();
     }
 
     public List<String> getPlacesWith(String str) {

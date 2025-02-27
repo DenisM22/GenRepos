@@ -10,7 +10,9 @@ import lombok.*;
 public class Parish {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "parish", nullable = false)
     private String parish;
-
 }
-

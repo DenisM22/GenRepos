@@ -58,7 +58,8 @@
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.6",
     "zod": "^3.24.1",
-    "use-debounce": "latest",
+    "@emotion/is-prop-valid": "latest",
+    "framer-motion": "latest",
     "axios": "latest"
   },
   "devDependencies": {

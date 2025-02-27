@@ -6,13 +6,31 @@ export const api = axios.create({
   baseURL: API_URL,
 })
 
-export const documentApi = {
-  getAll: (str?: string, page = 0) => api.get(`/document/get-all`, { params: { str, page } }),
-  getById: (id: number) => api.get(`/document/get/${id}`),
+export const metricDocumentApi = {
+  getAll: (str?: string, page = 0) => api.get(`/metric-document/get-all`, { params: { str, page } }),
+  getById: (id: number) => api.get(`/metric-document/get/${id}`),
   save: (document: any) =>
-    api.post("/document/save", document, {
+    api.post("/metric-document/save", document, {
       headers: { "Content-Type": "application/json" },
     }),
+}
+
+export const confessionalDocumentApi = {
+  getAll: (str?: string, page = 0) => api.get(`/confessional-document/get-all`, { params: { str, page } }),
+  getById: (id: number) => api.get(`/confessional-document/get/${id}`),
+  save: (document: any) =>
+      api.post("/confessional-document/save", document, {
+        headers: { "Content-Type": "application/json" },
+      }),
+}
+
+export const revisionDocumentApi = {
+  getAll: (str?: string, page = 0) => api.get(`/revision-document/get-all`, { params: { str, page } }),
+  getById: (id: number) => api.get(`/revision-document/get/${id}`),
+  save: (document: any) =>
+      api.post("/revision-document/save", document, {
+        headers: { "Content-Type": "application/json" },
+      }),
 }
 
 export const personApi = {
@@ -28,5 +46,7 @@ export const autocompleteApi = {
   getFirstNames: (str: string) => api.get(`/autocomplete/first-names`, { params: { str } }),
   getLastNames: (str: string) => api.get(`/autocomplete/last-names`, { params: { str } }),
   getMiddleNames: (str: string) => api.get(`/autocomplete/middle-names`, { params: { str } }),
-  getPlaces: (str: string) => api.get(`/autocomplete/places`, { params: { str } })
+  getUyezdy: () => api.get(`/autocomplete/uyezdy`),
+  getVolosts: (uyezdId: number, str: string) => api.get(`/autocomplete/volosts`, { params: { uyezdId, str } }),
+  getPlaces: (volostId: number, str: string) => api.get(`/autocomplete/places`, { params: { volostId, str } }),
 }

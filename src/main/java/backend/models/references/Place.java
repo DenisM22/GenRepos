@@ -10,7 +10,15 @@ import lombok.*;
 public class Place {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "place", nullable = false)
     private String place;
+
+    @ManyToOne
+    @JoinColumn(name = "volost_id")
+    private Volost volost;
 
 }
 

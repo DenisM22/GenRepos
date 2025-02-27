@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface LastNameRepository extends JpaRepository<LastName, Long> {
+public interface LastNameRepository extends JpaRepository<LastName, String> {
 
     List<LastName> findAllByLastNameStartingWithIgnoreCase(String str);
 

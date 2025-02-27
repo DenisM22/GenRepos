@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface FirstNameRepository extends JpaRepository<FirstName, Long> {
+public interface FirstNameRepository extends JpaRepository<FirstName, String> {
 
     List<FirstName> findAllByFirstNameStartingWithIgnoreCase(String str);
 

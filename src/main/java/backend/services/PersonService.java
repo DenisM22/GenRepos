@@ -1,9 +1,8 @@
 package backend.services;
 
-import backend.dto.DocumentLightDto;
 import backend.dto.PersonLightDto;
-import backend.models.Document;
 import backend.models.Person;
+import backend.models.references.Gender;
 import backend.repositories.FuzzyDateRepository;
 import backend.repositories.PersonRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,6 @@ public class PersonService {
 
     private final PersonRepository personRepository;
     private final ModelMapper modelMapper;
-    private final FuzzyDateRepository fuzzyDateRepository;
 
     public List<PersonLightDto> getAllPeople(String str) {
         List<Person> people;
@@ -36,13 +34,24 @@ public class PersonService {
     }
 
     public void savePerson(Person person) {
-        if (person.getBirthDate() != null)
-            fuzzyDateRepository.save(person.getBirthDate());
-        if (person.getDeathDate() != null)
-            fuzzyDateRepository.save(person.getDeathDate());
+        if (person.getChildren() != null) {
+            List<Person> children = person.getChildren().stream()
+                    .map(child -> getPersonById(child.getId())).toList();
+
+            if (person.getGender().equals(Gender.MALE)) {
+                children.forEach(child -> {
+                    child.setFather(person);
+                });
+            } else {
+                children.forEach(child -> {
+                    child.setMother(person);
+                });
+            }
+
+            person.setChildren(children);
+        }
+
         personRepository.save(person);
     }
-
-
 
 }

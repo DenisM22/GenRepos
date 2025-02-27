@@ -1,0 +1,97 @@
+"use client"
+
+import { useState } from "react"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { FileText, Search } from "lucide-react"
+import type { ConfessionalDocument } from "@/app/types/models"
+import { metricDocumentApi, confessionalDocumentApi, revisionDocumentApi } from "@/app/api/api"
+import { useDebounce } from "@/hooks/useDebounce"
+import { AxiosError } from "axios"
+
+export default function DocumentSearch() {
+    const [message, setMessage] = useState('')
+    const [documents, setDocuments] = useState<ConfessionalDocument[]>([])
+    const [searchTerm, setSearchTerm] = useState("")
+    const [selectedApi, setSelectedApi] = useState<string>("confessionalDocumentApi")
+    const debouncedSearchTerm = useDebounce(searchTerm, 300)
+
+    const fetchDocuments = async () => {
+        try {
+            let response
+            switch (selectedApi) {
+                case "metricDocumentApi":
+                    response = await metricDocumentApi.getAll(debouncedSearchTerm)
+                    break
+                case "confessionalDocumentApi":
+                    response = await confessionalDocumentApi.getAll(debouncedSearchTerm)
+                    break
+                case "revisionDocumentApi":
+                    response = await revisionDocumentApi.getAll(debouncedSearchTerm)
+                    break
+            }
+
+            setDocuments(response?.data || [])
+        } catch (error: unknown) {
+            if (error instanceof AxiosError) {
+                console.error(error.response?.data)
+                setMessage('Ошибка при загрузке документов: ' + (error.response?.data?.message || error.message))
+            } else {
+                console.error(error)
+                setMessage('Неизвестная ошибка')
+            }
+        }
+    }
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault()
+        fetchDocuments()
+    }
+
+    return (
+        <div className="space-y-4">
+            {/* Кнопки выбора API */}
+            <div className="flex space-x-2">
+                <Button variant={selectedApi === "metricDocumentApi" ? "default" : "outline"} onClick={() => setSelectedApi("metricDocumentApi")}>
+                    Метрические книги
+                </Button>
+                <Button variant={selectedApi === "confessionalDocumentApi" ? "default" : "outline"} onClick={() => setSelectedApi("confessionalDocumentApi")}>
+                    Исповедные ведомости
+                </Button>
+                <Button variant={selectedApi === "revisionDocumentApi" ? "default" : "outline"} onClick={() => setSelectedApi("revisionDocumentApi")}>
+                    Ревизские сказки
+                </Button>
+            </div>
+
+            <form onSubmit={handleSearch} className="flex space-x-2">
+                <div className="relative flex-grow">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                        type="text"
+                        placeholder="Поиск документов..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                    />
+                </div>
+                <Button type="submit">Поиск</Button>
+            </form>
+
+            {message && <p className="mt-4 text-center text-red-500">{message}</p>}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {documents.map((doc) => (
+                    <Card key={doc.id} className="card-hover">
+                        <CardHeader className="flex flex-row items-center space-x-4 pb-2">
+                            <FileText size={24} className="text-primary" />
+                            <CardTitle className="text-xl">{doc.title}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-muted-foreground">Год создания: {doc.createdAt}</p>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+        </div>
+    )
+}

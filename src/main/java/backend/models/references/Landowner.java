@@ -10,7 +10,14 @@ import lombok.*;
 public class Landowner {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "landowner", nullable = false)
     private String landowner;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "place_id")
+    private Place place;
 }
 

@@ -29,16 +29,21 @@ public class Person {
     @Column(name = "gender")
     private Gender gender;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "birth_date")
     private FuzzyDate birthDate;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "death_date")
     private FuzzyDate deathDate;
 
-    @Column(name = "place")
-    private String place;
+    @ManyToOne
+    @JoinColumn(name = "place_id")
+    private Place place;
+
+    @ManyToOne
+    @JoinColumn(name = "social_status_id")
+    private SocialStatus socialStatus;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "spouse_id")
@@ -52,7 +57,7 @@ public class Person {
     @JoinColumn(name = "mother_id")
     private Person mother;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "parents_children",
             joinColumns = @JoinColumn(name = "parent_id"),

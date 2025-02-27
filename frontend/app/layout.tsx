@@ -1,13 +1,14 @@
+import type React from "react"
+import "./globals.css"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
-import "./globals.css"
-import Header from "./components/Header"
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] })
 
 export const metadata: Metadata = {
-  title: "Генеалогический сервис",
-  description: "Исследуйте свою семейную историю",
+  title: "ГенРепозиторий - Хранение генеалогических данных",
+  description: "Сервис для хранения и организации генеалогических данных и семейной истории",
+    generator: 'v0.dev'
 }
 
 export default function RootLayout({
@@ -17,11 +18,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ru">
-      <body className={inter.className}>
-        <Header />
-        <main className="container mx-auto p-4">{children}</main>
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
   )
 }
 
+
+
+import './globals.css'

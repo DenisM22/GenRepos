@@ -1,0 +1,58 @@
+package backend.services;
+
+import backend.dto.DocumentLightDto;
+import backend.models.metricDocuments.MetricDocument;
+import backend.repositories.MetricDocumentRepository;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Base64;
+import java.util.List;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class MetricDocumentService {
+
+    private final MetricDocumentRepository metricDocumentRepository;
+    private final ModelMapper modelMapper;
+    private final int SIZE = 1;
+    private final String IMAGE_PATH = "C:\\Program Files\\PostgreSQL\\17\\data\\images\\MetricDocuments";
+
+    public List<DocumentLightDto> getDocumentsStartingWith(String str) {
+        List<MetricDocument> metricDocuments;
+        if (str == null || str.isEmpty())
+            metricDocuments = metricDocumentRepository.findAll();
+        else
+            metricDocuments = metricDocumentRepository.findAllByTitleContainingIgnoreCase(str);
+        return metricDocuments.stream().map(document ->
+                modelMapper.map(document, DocumentLightDto.class)).toList();
+    }
+
+    public MetricDocument getDocumentById(Long id) {
+        return metricDocumentRepository.findById(id).orElseThrow(() -> new RuntimeException("Документ не найден"));
+    }
+
+    public void saveDocument(MetricDocument metricDocument) throws IOException {
+        //Сохранение изображения в директорию и замена поля на путь к файлу
+        if (metricDocument.getImage() != null && !metricDocument.getImage().isEmpty()) {
+            String fileName = UUID.randomUUID() + ".png";
+            Path filePath = Paths.get(IMAGE_PATH, fileName);
+
+            Files.createDirectories(filePath.getParent());
+            Files.write(filePath, Base64.getDecoder().decode(metricDocument.getImage()));
+            metricDocument.setImage(null);
+            metricDocument.setImage(filePath.toString());
+        }
+
+        metricDocumentRepository.save(metricDocument);
+    }
+
+}

@@ -1,6 +1,5 @@
 package backend.dto;
 
-import backend.models.PersonFromDocument;
 import lombok.Data;
 
 import java.util.List;
@@ -15,6 +14,6 @@ public class DocumentDto {
     private String place;
     private String household;
     private byte[] image;
-    private List<PersonFromDocument> people;
+    private List<PersonLightDto> people;
 
 }

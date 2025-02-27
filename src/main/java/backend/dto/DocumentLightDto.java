@@ -7,6 +7,6 @@ public class DocumentLightDto {
 
     private Long id;
     private String title;
-    private Short yearOfCreation;
+    private Short createdAt;
 
 }

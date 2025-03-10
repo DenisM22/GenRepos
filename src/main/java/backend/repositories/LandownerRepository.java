@@ -9,6 +9,6 @@ import java.util.List;
 @Repository
 public interface LandownerRepository extends JpaRepository<Landowner, Long> {
 
-    List<Landowner> findByLandownerStartingWithIgnoreCase(String str);
+    List<Landowner> findByLandownerContainingIgnoreCase(String str);
 
 }

@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { SearchBar } from "@/components/search-bar"
 import { FilterDropdown } from "@/components/filter-dropdown"
 import Header from "@/components/header"
-import { User, Plus } from "lucide-react"
+import {User, Plus, Search} from "lucide-react"
 import type { Person } from "@/app/types/models"
 import { personApi } from "@/app/api/api"
 import {AxiosError} from "axios"
@@ -64,23 +64,29 @@ export default function PeoplePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Люди</h1>
-          <Link href="/add-person">
-            <Button>
-              <Plus className="mr-2 h-4 w-4"/> Добавить человека
-            </Button>
-          </Link>
-        </div>
+      <div className="min-h-screen bg-background">
+        <Header/>
+        <main className="container mx-auto px-4 py-8">
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl font-bold">Люди</h1>
+            <Link href="/people/new">
+              <Button>
+                <Plus className="mr-2 h-4 w-4"/> Добавить человека
+              </Button>
+            </Link>
+          </div>
 
-        <form onSubmit={handleSearch}>
           <div className="grid gap-4 md:grid-cols-[1fr_200px_200px] mb-8">
-            <SearchBar
-                placeholder="Поиск людей..."
-                onSearch={setQuery}/>
+            <div className="relative">
+              <SearchBar placeholder="Поиск людей..." onSearch={setQuery}/>
+              <Button
+                  size="sm"
+                  className="absolute right-1 top-1/2 -translate-y-1/2"
+                  onClick={(e) => handleSearch(e)}
+              >
+                <Search className="h-4 w-4"/>
+              </Button>
+            </div>
             <FilterDropdown
                 options={relationOptions}
                 placeholder="Отношение"
@@ -90,33 +96,27 @@ export default function PeoplePage() {
                 placeholder="Год рождения"
                 onSelect={handleBirthYearSelect}/>
           </div>
-          <Button type="submit">Поиск</Button>
-        </form>
 
-        {message && <p className="mt-4 text-center text-red-500">{message}</p>}
+          {message && <p className="mt-4 text-center text-red-500">{message}</p>}
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {people.map((person) => (
                 <Link href={`/people/${person.id}`} key={person.id}>
                   <Card className="hover:shadow-md transition-shadow">
                     <CardHeader>
                       <CardTitle className="flex items-center">
                         <User className="mr-2 h-5 w-5 text-primary"/>
-                        {person.firstName} {person.lastName}
+                        {person.lastName} {person.firstName} {person.middleName}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <p className="text-sm text-muted-foreground">Год рождения: {person.birthDate?.exactDate}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Отношение: {relationOptions.find((r) => r.value === person.socialStatus)?.label}
-                      </p>
                     </CardContent>
                   </Card>
                 </Link>
             ))}
           </div>
-      </main>
-    </div>
-)
+        </main>
+      </div>
+  )
 }
-

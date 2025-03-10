@@ -19,7 +19,7 @@ export default function Home() {
                 Современный сервис для хранения, организации и исследования генеалогических данных и семейной истории.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/add-document">
+                <Link href="/documents/new">
                   <Button size="lg" className="gap-2 text-base h-12 px-6 group">
                     Добавить документ
                     <ChevronRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />

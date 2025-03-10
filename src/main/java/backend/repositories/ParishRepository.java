@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface ParishRepository extends JpaRepository<Parish, Long> {
 
-    List<Parish> findAllByParishStartingWithIgnoreCase(String str);
+    List<Parish> findAllByParishContainingIgnoreCase(String str);
 
 }

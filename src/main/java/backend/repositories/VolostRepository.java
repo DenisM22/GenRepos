@@ -9,6 +9,6 @@ import java.util.List;
 @Repository
 public interface VolostRepository extends JpaRepository<Volost, Long> {
 
-    List<Volost> findAllByUyezd_IdAndVolostStartingWithIgnoreCase(Long uyezdId, String volost);
+    List<Volost> findAllByUyezd_Id(Long uyezdId);
 
 }

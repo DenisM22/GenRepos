@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { SearchBar } from "@/components/search-bar"
 import { FilterDropdown } from "@/components/filter-dropdown"
 import Header from "@/components/header"
-import { FileText, Plus } from "lucide-react"
+import {FileText, Plus, Search} from "lucide-react"
 import type {ConfessionalDocument, MetricDocument, RevisionDocument} from "@/app/types/models";
 import { metricDocumentApi, confessionalDocumentApi, revisionDocumentApi } from "@/app/api/api"
 import { AxiosError } from "axios"
@@ -80,49 +80,52 @@ export default function DocumentsPage() {
       <main className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">Документы</h1>
-          <Link href="/add-document">
+          <Link href="/documents/new">
             <Button>
               <Plus className="mr-2 h-4 w-4"/> Добавить документ
             </Button>
           </Link>
         </div>
 
-        <form onSubmit={handleSearch}>
-          <div className="grid gap-4 md:grid-cols-[1fr_200px_200px] mb-8">
-            <SearchBar
-                placeholder="Поиск документов..."
-                onSearch={setQuery}/>
-            <FilterDropdown
-                options={documentTypes}
-                placeholder="Тип документа"
-                onSelect={handleTypeSelect}/>
-            <FilterDropdown
-                options={yearOptions}
-                placeholder="Год создания"
-                onSelect={handleYearSelect}/>
+        <div className="grid gap-4 md:grid-cols-[1fr_200px_200px] mb-8">
+          <div className="relative">
+            <SearchBar placeholder="Поиск документов..." onSearch={setQuery}/>
+            <Button
+                size="sm"
+                className="absolute right-1 top-1/2 -translate-y-1/2"
+                onClick={(e) => handleSearch(e)}>
+              <Search className="h-4 w-4"/>
+            </Button>
           </div>
-          <Button type="submit">Поиск</Button>
-        </form>
+          <FilterDropdown
+              options={documentTypes}
+              placeholder="Тип документа"
+              onSelect={handleTypeSelect}/>
+          <FilterDropdown
+              options={yearOptions}
+              placeholder="Год создания"
+              onSelect={handleYearSelect}/>
+        </div>
 
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {documents.map((doc) => (
-                <Link href={`/documents/${doc.id}`} key={doc.id}>
-                  <Card className="hover:shadow-md transition-shadow">
-                    <CardHeader>
-                      <CardTitle className="flex items-center">
-                        <FileText className="mr-2 h-5 w-5 text-primary"/>
-                        {doc.title}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground">Год: {doc.createdAt}</p>
-                    </CardContent>
-                  </Card>
-                </Link>
-            ))}
-          </div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {documents.map((doc) => (
+              <Link href={`/documents/${doc.id}`} key={doc.id}>
+                <Card className="hover:shadow-md transition-shadow">
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <FileText className="mr-2 h-5 w-5 text-primary"/>
+                      {doc.title}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground">Год: {doc.createdAt}</p>
+                  </CardContent>
+                </Card>
+              </Link>
+          ))}
+        </div>
       </main>
     </div>
-)
+  )
 }
 

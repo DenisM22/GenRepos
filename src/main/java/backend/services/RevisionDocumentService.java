@@ -42,16 +42,16 @@ public class RevisionDocumentService {
     }
 
     public void saveDocument(RevisionDocument revisionDocument) throws IOException {
-        //Сохранение изображения в директорию и замена поля на путь к файлу
-        if (revisionDocument.getImage() != null && !revisionDocument.getImage().isEmpty()) {
-            String fileName = UUID.randomUUID() + ".png";
-            Path filePath = Paths.get(IMAGE_PATH, fileName);
-
-            Files.createDirectories(filePath.getParent());
-            Files.write(filePath, Base64.getDecoder().decode(revisionDocument.getImage()));
-            revisionDocument.setImage(null);
-            revisionDocument.setImage(filePath.toString());
-        }
+//        //Сохранение изображения в директорию и замена поля на путь к файлу
+//        if (revisionDocument.getFile() != null && !revisionDocument.getFile().isEmpty()) {
+//            String fileName = UUID.randomUUID() + ".png";
+//            Path filePath = Paths.get(IMAGE_PATH, fileName);
+//
+//            Files.createDirectories(filePath.getParent());
+//            Files.write(filePath, Base64.getDecoder().decode(revisionDocument.getFile()));
+//            revisionDocument.setFile(null);
+//            revisionDocument.setFile(filePath.toString());
+//        }
 
         revisionDocumentRepository.save(revisionDocument);
     }

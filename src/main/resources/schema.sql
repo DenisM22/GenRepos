@@ -121,8 +121,7 @@ CREATE TABLE IF NOT EXISTS metric_documents (
     id BIGSERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     created_at SMALLINT,
-    parish_id BIGINT REFERENCES parishes(id),
-    image VARCHAR
+    parish_id BIGINT REFERENCES parishes(id)
     );
 
 CREATE TABLE IF NOT EXISTS birth_records (
@@ -154,7 +153,10 @@ CREATE TABLE IF NOT EXISTS birth_records (
     godparent_middle_name VARCHAR(255),
     godparent_place_id BIGINT REFERENCES places(id),
     godparent_family_status_id BIGINT REFERENCES family_statuses(id),
-    godparent_social_status_id BIGINT REFERENCES social_statuses(id)
+    godparent_social_status_id BIGINT REFERENCES social_statuses(id),
+
+    image VARCHAR,
+    image_description VARCHAR
 );
 
 CREATE TABLE IF NOT EXISTS death_records (
@@ -170,7 +172,10 @@ CREATE TABLE IF NOT EXISTS death_records (
     family_status_id BIGINT REFERENCES family_statuses(id),
     social_status_id BIGINT REFERENCES social_statuses(id),
     death_cause VARCHAR(255),
-    burial_place_id BIGINT REFERENCES places(id)
+    burial_place_id BIGINT REFERENCES places(id),
+
+    image VARCHAR,
+    image_description VARCHAR
 );
 
 CREATE TABLE IF NOT EXISTS marriage_records (
@@ -217,7 +222,10 @@ CREATE TABLE IF NOT EXISTS marriage_records (
     guarantor_place_id BIGINT REFERENCES places(id),
     guarantor_role VARCHAR(255),
     guarantor_family_status_id BIGINT REFERENCES family_statuses(id),
-    guarantor_social_status_id BIGINT REFERENCES social_statuses(id)
+    guarantor_social_status_id BIGINT REFERENCES social_statuses(id),
+
+    image VARCHAR,
+    image_description VARCHAR
     );
 
 --Исповедная ведомость
@@ -225,8 +233,7 @@ CREATE TABLE IF NOT EXISTS confessional_documents (
     id BIGSERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     created_at SMALLINT,
-    parish_id BIGINT REFERENCES parishes(id),
-    image VARCHAR
+    parish_id BIGINT REFERENCES parishes(id)
     );
 
 CREATE TABLE IF NOT EXISTS people_from_confessional_documents (
@@ -242,7 +249,10 @@ CREATE TABLE IF NOT EXISTS people_from_confessional_documents (
     household VARCHAR(255),
     landowner_id BIGINT REFERENCES landowners(id),
     family_status_id BIGINT REFERENCES family_statuses(id),
-    social_status_id BIGINT REFERENCES social_statuses(id)
+    social_status_id BIGINT REFERENCES social_statuses(id),
+
+    image VARCHAR,
+    image_description VARCHAR
     );
 
 --Ревизская сказка
@@ -250,8 +260,7 @@ CREATE TABLE IF NOT EXISTS revision_documents (
     id BIGSERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     created_at SMALLINT,
-    place_id BIGINT REFERENCES places(id),
-    image VARCHAR
+    place_id BIGINT REFERENCES places(id)
     );
 
 CREATE TABLE IF NOT EXISTS people_from_revision_documents (
@@ -273,5 +282,8 @@ CREATE TABLE IF NOT EXISTS people_from_revision_documents (
 
     --Для женщин дополнительно
     marriage_place_id BIGINT REFERENCES places(id),
-    marriage_document BOOLEAN DEFAULT FALSE
+    marriage_document BOOLEAN DEFAULT FALSE,
+
+    image VARCHAR,
+    image_description VARCHAR
     );

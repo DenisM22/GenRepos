@@ -9,6 +9,6 @@ import java.util.List;
 @Repository
 public interface PlaceRepository extends JpaRepository<Place, Long> {
 
-    List<Place> findAllByVolost_IdAndPlaceStartingWithIgnoreCase(Long volostId, String place);
+    List<Place> findAllByVolost_Id(Long volostId);
 
 }

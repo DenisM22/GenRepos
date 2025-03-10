@@ -58,4 +58,10 @@ public class PersonFromConfessionalDocument {
     @JoinColumn(name = "social_status_id")
     private SocialStatus socialStatus;
 
+    @Column(name = "image")
+    private String image;
+
+    @Column(name = "image_description")
+    private String imageDescription;
+
 }

@@ -16,7 +16,7 @@ public class Landowner {
     @Column(name = "landowner", nullable = false)
     private String landowner;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "place_id")
     private Place place;
 }

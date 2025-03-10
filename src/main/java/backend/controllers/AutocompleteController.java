@@ -28,25 +28,37 @@ public class AutocompleteController {
     }
 
     @GetMapping("/uyezdy")
-    public ResponseEntity<?> getAllUyezdy() {
-        return ResponseEntity.ok(autocompleteService.getAllUyezdy());
+    public ResponseEntity<?> getUyezdy() {
+        return ResponseEntity.ok(autocompleteService.getUyezdy());
     }
 
     @GetMapping("/volosts")
-    public ResponseEntity<?> getVolostsWith(@RequestParam(name = "uyezdId") Long uyezdId,
-                                            @RequestParam(name = "str") String str) {
-        return ResponseEntity.ok(autocompleteService.getVolostsStartingWith(uyezdId, str));
+    public ResponseEntity<?> getVolosts(@RequestParam(name = "uyezdId") Long uyezdId) {
+        return ResponseEntity.ok(autocompleteService.getVolosts(uyezdId));
     }
 
     @GetMapping("/places")
-    public ResponseEntity<?> getPlacesWith(@RequestParam(name = "volostId") Long volostId,
-                                           @RequestParam(name = "str") String str) {
-        return ResponseEntity.ok(autocompleteService.getPlacesStartingWith(volostId, str));
+    public ResponseEntity<?> getPlaces(@RequestParam(name = "volostId") Long volostId) {
+        return ResponseEntity.ok(autocompleteService.getPlaces(volostId));
     }
 
     @GetMapping("/parishes")
-    public ResponseEntity<?> getParishesWith(@RequestParam(name = "str") String str) {
-        return ResponseEntity.ok(autocompleteService.getParishesStartingWith(str));
+    public ResponseEntity<?> getParishesContaining(@RequestParam(name = "str") String str) {
+        return ResponseEntity.ok(autocompleteService.getParishesContaining(str));
     }
 
+    @GetMapping("/family-statuses")
+    public ResponseEntity<?> getFamilyStatuses() {
+        return ResponseEntity.ok(autocompleteService.getFamilyStatuses());
+    }
+
+    @GetMapping("/social-statuses")
+    public ResponseEntity<?> getSocialStatuses() {
+        return ResponseEntity.ok(autocompleteService.getSocialStatuses());
+    }
+
+    @GetMapping("/landowners")
+    public ResponseEntity<?> getLandowners(@RequestParam(name = "str") String str) {
+        return ResponseEntity.ok(autocompleteService.getLandowners(str));
+    }
 }

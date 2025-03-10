@@ -27,9 +27,6 @@ public class RevisionDocument {
     @JoinColumn(name = "place_id")
     private Place place;
 
-    @Column(name = "image")
-    private String image;
-
     @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PersonFromRevisionDocument> people;
 

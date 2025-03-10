@@ -27,9 +27,6 @@ public class MetricDocument {
     @JoinColumn(name = "parish_id")
     private Parish parish;
 
-    @Column(name = "image")
-    private String image;
-
     @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BirthRecord> birthRecords;
 

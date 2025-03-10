@@ -62,13 +62,30 @@ export interface Person {
   children?: Person[]
 }
 
+export interface MetricDocument {
+  id?: number
+  title?: string
+  createdAt?: number
+  parish?: Parish | null
+  birthRecords?: BirthRecord[] | null
+  deathRecords?: DeathRecord[] | null
+  marriageRecords?: MarriageRecord[] | null
+}
+
 export interface ConfessionalDocument {
   id?: number
   title?: string
   createdAt?: number
   parish?: Parish | null
-  image?: string | null
   people?: PersonFromConfessionalDocument[] | null
+}
+
+export interface RevisionDocument {
+  id?: number
+  title?: string
+  createdAt?: number
+  place?: Place | null
+  people?: PersonFromRevisionDocument[] | null
 }
 
 export interface PersonFromConfessionalDocument {
@@ -80,20 +97,16 @@ export interface PersonFromConfessionalDocument {
   gender?: "MALE" | "FEMALE"
   birthDate?: FuzzyDate | null
   deathDate?: FuzzyDate | null
+  uyezd?: Uyezd | null
+  volost?: Volost | null
   place?: Place | null
   household?: string
   landowner?: Landowner | null
   familyStatus?: FamilyStatus | null
   socialStatus?: SocialStatus | null
-}
 
-export interface RevisionDocument {
-  id?: number
-  title?: string
-  createdAt?: number
-  place?: Place | null
-  image?: string | null
-  people?: PersonFromRevisionDocument[] | null
+  image?: string
+  imageDescription?: string
 }
 
 export interface PersonFromRevisionDocument {
@@ -113,17 +126,11 @@ export interface PersonFromRevisionDocument {
   departureReason?: string
   marriagePlace?: Place | null
   marriageDocument?: boolean
-}
 
-export interface MetricDocument {
-  id?: number
-  title?: string
-  createdAt?: number
-  parish?: Parish | null
-  image?: string | null
-  birthRecords?: BirthRecord[] | null
-  deathRecords?: DeathRecord[] | null
-  marriageRecords?: MarriageRecord[] | null
+  image?: string
+  imageDescription?: string
+
+  number?: number
 }
 
 export interface BirthRecord {
@@ -151,6 +158,9 @@ export interface BirthRecord {
   godparentPlace?: Place
   godparentFamilyStatus?: FamilyStatus
   godparentSocialStatus?: SocialStatus
+
+  image?: string
+  imageDescription?: string
 }
 
 export interface DeathRecord {
@@ -166,6 +176,9 @@ export interface DeathRecord {
   socialStatus?: SocialStatus
   deathCause?: string
   burialPlace?: Place
+
+  image?: string
+  imageDescription?: string
 }
 
 export interface MarriageRecord {
@@ -208,24 +221,12 @@ export interface MarriageRecord {
   guarantorRole?: string
   guarantorFamilyStatus?: FamilyStatus
   guarantorSocialStatus?: SocialStatus
+
+  image?: string
+  imageDescription?: string
 }
 
-
-
-
-export interface Record {
-  id: string
-  number: number
-  name: string
-  relation: string
-  details: string
-  uyezd?: Uyezd | null
-  volost?: Volost | null
-  place?: Place | null
-}
-
-export interface Template {
+export interface Template extends Omit<PersonFromConfessionalDocument, "id" | "number"> {
   id: string
   name: string
 }
-

@@ -43,10 +43,14 @@ export const personApi = {
 }
 
 export const autocompleteApi = {
-  getFirstNames: (str: string) => api.get(`/autocomplete/first-names`, { params: { str } }),
-  getLastNames: (str: string) => api.get(`/autocomplete/last-names`, { params: { str } }),
-  getMiddleNames: (str: string) => api.get(`/autocomplete/middle-names`, { params: { str } }),
-  getUyezdy: () => api.get(`/autocomplete/uyezdy`),
-  getVolosts: (uyezdId: number, str: string) => api.get(`/autocomplete/volosts`, { params: { uyezdId, str } }),
-  getPlaces: (volostId: number, str: string) => api.get(`/autocomplete/places`, { params: { volostId, str } }),
+    getFirstNames: (str: string) => api.get(`/autocomplete/first-names`, { params: { str } }),
+    getLastNames: (str: string) => api.get(`/autocomplete/last-names`, { params: { str } }),
+    getMiddleNames: (str: string) => api.get(`/autocomplete/middle-names`, { params: { str } }),
+    getUyezdy: () => api.get(`/autocomplete/uyezdy`),
+    getVolosts: (uyezdId: number) => api.get(`/autocomplete/volosts`, { params: { uyezdId } }),
+    getPlaces: (volostId: number) => api.get(`/autocomplete/places`, { params: { volostId } }),
+    getParishes: (str: string) => api.get(`/autocomplete/parishes`, {params: {str} }),
+    getFamilyStatuses: () => api.get(`/autocomplete/family-statuses`),
+    getSocialStatuses: () => api.get(`/autocomplete/social-statuses`),
+    getLandowners: (str: string) => api.get(`/autocomplete/landowners`, {params: {str} }),
 }

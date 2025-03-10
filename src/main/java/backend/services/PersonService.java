@@ -34,6 +34,34 @@ public class PersonService {
     }
 
     public void savePerson(Person person) {
+
+        if (person.getFather() != null) {
+            try {
+                Person father = getPersonById(person.getFather().getId());
+                father.addChild(person);
+            } catch (RuntimeException e) {
+                throw new RuntimeException("Родственник(отец) не найден");
+            }
+        }
+
+        if (person.getMother() != null) {
+            try {
+                Person mother = getPersonById(person.getMother().getId());
+                mother.addChild(person);
+            } catch (RuntimeException e) {
+                throw new RuntimeException("Родственник(мать) не найден");
+            }
+        }
+
+        if (person.getSpouse() != null) {
+            try {
+                Person spouse = getPersonById(person.getSpouse().getId());
+                spouse.setSpouse(person);
+            } catch (RuntimeException e) {
+                throw new RuntimeException("Родственник(отец) не найден");
+            }
+        }
+
         if (person.getChildren() != null) {
             List<Person> children = person.getChildren().stream()
                     .map(child -> getPersonById(child.getId())).toList();

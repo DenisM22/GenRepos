@@ -66,4 +66,9 @@ public class PersonFromRevisionDocument {
     @Column(name = "marriage_document")
     private Boolean marriageDocument;
 
+    @Column(name = "image")
+    private String image;
+
+    @Column(name = "image_description")
+    private String imageDescription;
 }

@@ -41,16 +41,16 @@ public class MetricDocumentService {
     }
 
     public void saveDocument(MetricDocument metricDocument) throws IOException {
-        //Сохранение изображения в директорию и замена поля на путь к файлу
-        if (metricDocument.getImage() != null && !metricDocument.getImage().isEmpty()) {
-            String fileName = UUID.randomUUID() + ".png";
-            Path filePath = Paths.get(IMAGE_PATH, fileName);
-
-            Files.createDirectories(filePath.getParent());
-            Files.write(filePath, Base64.getDecoder().decode(metricDocument.getImage()));
-            metricDocument.setImage(null);
-            metricDocument.setImage(filePath.toString());
-        }
+//        //Сохранение изображения в директорию и замена поля на путь к файлу
+//        if (metricDocument.getFile() != null && !metricDocument.getFile().isEmpty()) {
+//            String fileName = UUID.randomUUID() + ".png";
+//            Path filePath = Paths.get(IMAGE_PATH, fileName);
+//
+//            Files.createDirectories(filePath.getParent());
+//            Files.write(filePath, Base64.getDecoder().decode(metricDocument.getFile()));
+//            metricDocument.setFile(null);
+//            metricDocument.setFile(filePath.toString());
+//        }
 
         metricDocumentRepository.save(metricDocument);
     }

@@ -87,4 +87,10 @@ public class BirthRecord {
     @ManyToOne
     @JoinColumn(name = "godparent_social_status_id")
     private SocialStatus godparentSocialStatus;
+
+    @Column(name = "image")
+    private String image;
+
+    @Column(name = "image_description")
+    private String imageDescription;
 }

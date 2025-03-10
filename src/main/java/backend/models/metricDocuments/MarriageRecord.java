@@ -131,4 +131,9 @@ public class MarriageRecord {
     @JoinColumn(name = "guarantor_social_status_id")
     private SocialStatus guarantorSocialStatus;
 
+    @Column(name = "image")
+    private String image;
+
+    @Column(name = "image_description")
+    private String imageDescription;
 }

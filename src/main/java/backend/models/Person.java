@@ -4,12 +4,14 @@ import backend.models.references.*;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "people")
 @Getter
 @Setter
+@ToString
 public class Person {
 
     @Id
@@ -64,5 +66,12 @@ public class Person {
             inverseJoinColumns = @JoinColumn(name = "child_id")
     )
     private List<Person> children;
+
+    public void addChild(Person child) {
+        if (children == null) {
+            children = new ArrayList<>();
+        }
+        children.add(child);
+    }
 
 }

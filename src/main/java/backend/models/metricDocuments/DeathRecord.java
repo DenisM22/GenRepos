@@ -52,4 +52,10 @@ public class DeathRecord {
     @ManyToOne
     @JoinColumn(name = "burial_place_id")
     private Place burialPlace;
+
+    @Column(name = "image")
+    private String image;
+
+    @Column(name = "image_description")
+    private String imageDescription;
 }

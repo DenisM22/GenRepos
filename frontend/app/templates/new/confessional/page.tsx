@@ -1,21 +1,19 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect, useCallback } from "react"
-import { useRouter } from "next/navigation"
+import {useCallback, useEffect, useState} from "react"
+import {useRouter} from "next/navigation"
 import Header from "@/components/header"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Combobox } from "@/components/ui/combobox"
-import { templateStore } from "@/app/types/templateStore"
-import { toast } from "@/components/ui/use-toast"
-import { Save, Trash2, Calendar, MapPin, Paperclip as PaperclipIcon } from "lucide-react"
-import {Template, Place, Landowner, FamilyStatus, SocialStatus, Uyezd, Volost, FuzzyDate} from "@/app/types/models"
-import { autocompleteApi } from "@/app/api/api"
-import {isAny} from "tailwind-merge";
+import {Button} from "@/components/ui/button"
+import {Input} from "@/components/ui/input"
+import {Label} from "@/components/ui/label"
+import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card"
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
+import {templateConfessionalStore} from "@/app/types/templateStore"
+import {toast} from "@/components/ui/use-toast"
+import {Calendar, MapPin, Save} from "lucide-react"
+import {FamilyStatus, FuzzyDate, Landowner, Place, SocialStatus, Template, Uyezd, Volost} from "@/app/types/models"
+import {autocompleteApi} from "@/app/api/api"
 
 export default function AddTemplate() {
     const router = useRouter()
@@ -37,7 +35,7 @@ export default function AddTemplate() {
         socialStatus: null,
     })
     const [suggestions, setSuggestions] = useState({
-        names: { firstName: [], lastName: [], middleName: [], landowner: [] },
+        names: {firstName: [], lastName: [], middleName: [], landowner: []},
     })
     const [uyezdy, setUyezdy] = useState<Uyezd[]>([])
     const [volosts, setVolosts] = useState<Volost[]>([])
@@ -104,7 +102,7 @@ export default function AddTemplate() {
             ...template,
             id: Date.now().toString(),
         }
-        templateStore.addTemplate(newTemplate)
+        templateConfessionalStore.addTemplate(newTemplate)
         toast({
             title: "Шаблон добавлен",
             description: "Новый шаблон успешно создан",
@@ -114,9 +112,9 @@ export default function AddTemplate() {
 
     const handleInputChange = useCallback(async (field: keyof typeof template, value: string) => {
         if (field === "landowner") {
-            setTemplate((prev) => ({ ...prev, [field]:  { landowner: value, id: undefined, place: null } }))
+            setTemplate((prev) => ({...prev, [field]: {landowner: value, id: undefined, place: null}}))
         } else {
-            setTemplate((prev) => ({ ...prev, [field]: value }))
+            setTemplate((prev) => ({...prev, [field]: value}))
         }
 
         if (value.length > 1) {
@@ -137,13 +135,13 @@ export default function AddTemplate() {
                         break
                 }
 
-                setSuggestions((prev) => ({ ...prev, names: { ...prev.names, [field]: response?.data || [] } }))
+                setSuggestions((prev) => ({...prev, names: {...prev.names, [field]: response?.data || []}}))
 
             } catch (error) {
                 console.error(`Ошибка загрузки ${field}:`, error)
             }
         } else {
-            setSuggestions((prev) => ({ ...prev, names: { ...prev.names, [field]: [] } }))
+            setSuggestions((prev) => ({...prev, names: {...prev.names, [field]: []}}))
         }
     }, [])
     const renderSuggestionInput = (field: keyof typeof template, label: string, label2: string) => {
@@ -168,8 +166,15 @@ export default function AddTemplate() {
                                 key={index}
                                 className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                                 onClick={() => {
-                                    setTemplate((prev) => ({ ...prev, [field]: suggestion }))
-                                    setSuggestions({ names: { firstName: [], lastName: [], middleName: [], landowner: [] } })
+                                    setTemplate((prev) => ({...prev, [field]: suggestion}))
+                                    setSuggestions({
+                                        names: {
+                                            firstName: [],
+                                            lastName: [],
+                                            middleName: [],
+                                            landowner: []
+                                        }
+                                    })
                                 }}
                             >
                                 {suggestion}
@@ -205,8 +210,15 @@ export default function AddTemplate() {
                                     key={index}
                                     className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                                     onClick={() => {
-                                        setTemplate((prev) => ({ ...prev, landowner: suggestion }))
-                                        setSuggestions({ names: { firstName: [], lastName: [], middleName: [], landowner: [] } })
+                                        setTemplate((prev) => ({...prev, landowner: suggestion}))
+                                        setSuggestions({
+                                            names: {
+                                                firstName: [],
+                                                lastName: [],
+                                                middleName: [],
+                                                landowner: []
+                                            }
+                                        })
                                     }}
                                 >
                                     {displayText}
@@ -223,9 +235,12 @@ export default function AddTemplate() {
         return (
             <div className="space-y-2">
                 <Label className="text-base">Пол</Label>
-                <Select value={template.gender} onValueChange={(value) => setTemplate((prev) => ({ ...prev, gender: value as "MALE" | "FEMALE" }))}>
+                <Select value={template.gender} onValueChange={(value) => setTemplate((prev) => ({
+                    ...prev,
+                    gender: value as "MALE" | "FEMALE"
+                }))}>
                     <SelectTrigger>
-                        <SelectValue placeholder="Выберите пол" />
+                        <SelectValue placeholder="Выберите пол"/>
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="MALE">Мужской</SelectItem>
@@ -304,7 +319,7 @@ export default function AddTemplate() {
         return (
             <div className="space-y-2">
                 <Label className="text-base flex items-center gap-2">
-                    <MapPin className="h-4 w-4" />
+                    <MapPin className="h-4 w-4"/>
                     Место рождения
                 </Label>
 
@@ -312,12 +327,12 @@ export default function AddTemplate() {
                     value={template.uyezd?.id?.toString() || ""}
                     onValueChange={(value) => {
                         const selectedUyezd = uyezdy.find((u) => u.id?.toString() === value) || null
-                        setTemplate((prev) => ({ ...prev, uyezd: selectedUyezd }))
+                        setTemplate((prev) => ({...prev, uyezd: selectedUyezd}))
                         fetchVolosts(selectedUyezd?.id!)
                     }}
                 >
                     <SelectTrigger>
-                        <SelectValue placeholder="Выберите уезд" />
+                        <SelectValue placeholder="Выберите уезд"/>
                     </SelectTrigger>
                     <SelectContent>
                         {uyezdy.map((uyezd) => (
@@ -333,12 +348,12 @@ export default function AddTemplate() {
                     value={template.volost?.id?.toString() || ""}
                     onValueChange={(value) => {
                         const selectedVolost = volosts.find((v) => v.id?.toString() === value) || null
-                        setTemplate((prev) => ({ ...prev, volost: selectedVolost }))
+                        setTemplate((prev) => ({...prev, volost: selectedVolost}))
                         fetchPlaces(selectedVolost?.id!)
                     }}
                 >
                     <SelectTrigger>
-                        <SelectValue placeholder="Выберите волость" />
+                        <SelectValue placeholder="Выберите волость"/>
                     </SelectTrigger>
                     <SelectContent>
                         {volosts.map((volost) => (
@@ -354,11 +369,11 @@ export default function AddTemplate() {
                     value={template.place?.id?.toString() || ""}
                     onValueChange={(value) => {
                         const selectedPlace = places.find((p) => p.id?.toString() === value) || null
-                        setTemplate((prev) => ({ ...prev, place: selectedPlace }))
+                        setTemplate((prev) => ({...prev, place: selectedPlace}))
                     }}
                 >
                     <SelectTrigger>
-                        <SelectValue placeholder="Выберите место" />
+                        <SelectValue placeholder="Выберите место"/>
                     </SelectTrigger>
                     <SelectContent>
                         {places.map((place) => (
@@ -385,11 +400,12 @@ export default function AddTemplate() {
                     value={template[field]?.id?.toString() || ""}
                     onValueChange={(value) => {
                         const selectedStatus = statuses.find((status) => status.id?.toString() === value) || null
-                        setTemplate((prev) => ({ ...prev, [field]: selectedStatus }))
+                        setTemplate((prev) => ({...prev, [field]: selectedStatus}))
                     }}
                 >
                     <SelectTrigger>
-                        <SelectValue placeholder={isFamily ? "Выберите семейный статус" : "Выберите социальный статус"} />
+                        <SelectValue
+                            placeholder={isFamily ? "Выберите семейный статус" : "Выберите социальный статус"}/>
                     </SelectTrigger>
                     <SelectContent>
                         {statuses.map((status) => (
@@ -405,7 +421,7 @@ export default function AddTemplate() {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-            <Header />
+            <Header/>
             <main className="container mx-auto px-4 py-12">
                 <div className="max-w-2xl mx-auto">
                     <h1 className="text-4xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
@@ -423,7 +439,7 @@ export default function AddTemplate() {
                                         id="name"
                                         name="name"
                                         value={template.name}
-                                        onChange={(e) => setTemplate((prev) => ({ ...prev, name: e.target.value }))}
+                                        onChange={(e) => setTemplate((prev) => ({...prev, name: e.target.value}))}
                                         placeholder="Например: Родитель"
                                         required
                                     />
@@ -441,7 +457,7 @@ export default function AddTemplate() {
                                         id="household"
                                         name="household"
                                         value={template.household}
-                                        onChange={(e) => setTemplate((prev) => ({ ...prev, household: e.target.value }))}
+                                        onChange={(e) => setTemplate((prev) => ({...prev, household: e.target.value}))}
                                         placeholder="Двор"
                                         className="h-10 text-base"
                                     />
@@ -454,7 +470,7 @@ export default function AddTemplate() {
                         </CardContent>
                         <CardFooter>
                             <Button onClick={handleSubmit} className="w-full">
-                                <Save className="mr-2 h-4 w-4" /> Сохранить шаблон
+                                <Save className="mr-2 h-4 w-4"/> Сохранить шаблон
                             </Button>
                         </CardFooter>
                     </Card>

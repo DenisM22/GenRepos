@@ -84,12 +84,15 @@ export interface RevisionDocument {
   id?: number
   title?: string
   createdAt?: number
+  uyezd?: Uyezd | null
+  volost?: Volost | null
   place?: Place | null
   people?: PersonFromRevisionDocument[] | null
 }
 
 export interface PersonFromConfessionalDocument {
   id?: number
+  idDate?: number
   document?: ConfessionalDocument | null
   firstName?: string
   lastName?: string
@@ -111,6 +114,7 @@ export interface PersonFromConfessionalDocument {
 
 export interface PersonFromRevisionDocument {
   id?: number
+  idDate?: number
   document?: RevisionDocument | null
   firstName?: string
   lastName?: string
@@ -135,9 +139,12 @@ export interface PersonFromRevisionDocument {
 
 export interface BirthRecord {
   id?: number
+  idDate?: number
   document?: MetricDocument
   newbornName?: string
   birthDate?: FuzzyDate
+  uyezd?: Uyezd | null
+  volost?: Volost | null
   place?: Place
   landowner?: Landowner
   familyStatus?: FamilyStatus
@@ -155,6 +162,8 @@ export interface BirthRecord {
   godparentFirstName?: string
   godparentLastName?: string
   godparentMiddleName?: string
+  godparentUyezd?: Uyezd | null
+  godparentVolost?: Volost | null
   godparentPlace?: Place
   godparentFamilyStatus?: FamilyStatus
   godparentSocialStatus?: SocialStatus
@@ -163,26 +172,9 @@ export interface BirthRecord {
   imageDescription?: string
 }
 
-export interface DeathRecord {
-  id?: number
-  document?: MetricDocument
-  firstName?: string
-  lastName?: string
-  middleName?: string
-  age?: number
-  deathDate?: FuzzyDate
-  place?: Place
-  familyStatus?: FamilyStatus
-  socialStatus?: SocialStatus
-  deathCause?: string
-  burialPlace?: Place
-
-  image?: string
-  imageDescription?: string
-}
-
 export interface MarriageRecord {
   id?: number
+  idDate?: number
   document?: MetricDocument
   marriageDate?: FuzzyDate
 
@@ -190,6 +182,8 @@ export interface MarriageRecord {
   groomLastName?: string
   groomMiddleName?: string
   groomAge?: number
+  groomUyezd?: Uyezd
+  groomVolost?: Volost
   groomPlace?: Place
   groomLandowner?: Landowner
   groomSocialStatus?: SocialStatus
@@ -204,6 +198,8 @@ export interface MarriageRecord {
   brideLastName?: string
   brideMiddleName?: string
   brideAge?: number
+  brideUyezd?: Uyezd
+  brideVolost?: Volost
   bridePlace?: Place
   brideLandowner?: Landowner
   brideSocialStatus?: SocialStatus
@@ -217,6 +213,8 @@ export interface MarriageRecord {
   guarantorFirstName?: string
   guarantorLastName?: string
   guarantorMiddleName?: string
+  guarantorUyezd?: Uyezd
+  guarantorVolost?: Volost
   guarantorPlace?: Place
   guarantorRole?: string
   guarantorFamilyStatus?: FamilyStatus
@@ -226,7 +224,37 @@ export interface MarriageRecord {
   imageDescription?: string
 }
 
+export interface DeathRecord {
+  id?: number
+  idDate?: number
+  document?: MetricDocument
+  firstName?: string
+  lastName?: string
+  middleName?: string
+  gender?: "MALE" | "FEMALE"
+  age?: number
+  uyezd?: Uyezd
+  volost?: Volost
+  place?: Place
+
+  deathDate?: FuzzyDate
+  familyStatus?: FamilyStatus
+  socialStatus?: SocialStatus
+  deathCause?: string
+  burialUyezd?: Uyezd
+  burialVolost?: Volost
+  burialPlace?: Place
+
+  image?: string
+  imageDescription?: string
+}
+
 export interface Template extends Omit<PersonFromConfessionalDocument, "id" | "number"> {
+  id: string
+  name: string
+}
+
+export interface TemplateRevision extends Omit<PersonFromRevisionDocument, "id" | "number"> {
   id: string
   name: string
 }

@@ -20,5 +20,5 @@ class TemplateStore {
     }
 }
 
-export const templateStore = new TemplateStore()
-
+export const templateConfessionalStore = new TemplateStore()
+export const templateRevisionStore = new TemplateStore()

@@ -12,7 +12,7 @@ import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} f
 import {ScrollArea} from "@/components/ui/scroll-area"
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
 import {ConfessionalDocument, FuzzyDate, Parish, PersonFromConfessionalDocument, Template,} from "@/app/types/models"
-import {templateStore} from "@/app/types/templateStore"
+import {templateConfessionalStore} from "@/app/types/templateStore"
 import {toast} from "@/components/ui/use-toast"
 import {RecordForm} from "@/components/RecordForm"
 import {autocompleteApi, confessionalDocumentApi} from "@/app/api/api";
@@ -41,7 +41,7 @@ export default function AddDocument() {
     const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null)
 
     useEffect(() => {
-        setTemplates(templateStore.getTemplates())
+        setTemplates(templateConfessionalStore.getTemplates())
     }, [])
 
     // Обработчик изменения основных полей документа
@@ -60,11 +60,11 @@ export default function AddDocument() {
     }
 
     // Обработчик изменения записи
-    const handleRecordChange = useCallback((id: number, field: string, value: any, key?: keyof FuzzyDate) => {
+    const handleRecordChange = useCallback((idDate: number, field: string, value: any, key?: keyof FuzzyDate) => {
         setDocument((prev) => ({
             ...prev,
             people: prev.people.map((record) =>
-                record.id === id
+                record.idDate === idDate
                     ? {
                         ...record,
                         [field]: key
@@ -77,10 +77,10 @@ export default function AddDocument() {
     }, [])
 
     // Обработчик удаления записи
-    const removeRecord = useCallback((id: number) => {
+    const removeRecord = useCallback((idDate: number) => {
         setDocument((prev) => ({
             ...prev,
-            people: prev.people.filter((record) => record.id !== id),
+            people: prev.people.filter((record) => record.idDate !== idDate),
         }))
     }, [])
 
@@ -114,7 +114,6 @@ export default function AddDocument() {
         }
     }
 
-
     const validateDocument = (document: ConfessionalDocument): string | null => {
         if (!document.title?.trim()) {
             return `Укажите название документа`
@@ -140,16 +139,17 @@ export default function AddDocument() {
         e.preventDefault();
         try {
             await confessionalDocumentApi.save(document);
+            router.push("/documents/new")
             console.log("Документ успешно сохранен");
-            router.push("/documents")
         } catch (error) {
             console.error("Ошибка при сохранении документа:", error);
+            setMessage("Ошибка при сохранении документа:" + error)
         }
     }
 
     // Обновленный обработчик выбора шаблона
     const handleTemplateSelect = (templateId: string) => {
-        const selected = templateStore.getTemplateById(templateId)
+        const selected = templateConfessionalStore.getTemplateById(templateId)
         if (selected) {
             setCurrentTemplate(selected)
             setSelectedTemplateId(templateId)
@@ -174,14 +174,14 @@ export default function AddDocument() {
         }
         localStorage.setItem("tempDocumentState", JSON.stringify(documentToSave))
         localStorage.setItem("tempStep", step.toString())
-        router.push("/templates/new")
+        router.push("/templates/new/confessional")
     }
 
     // Добавление новой записи
     const addRecord = () => {
         const newRecord: PersonFromConfessionalDocument = currentTemplate
             ? {
-                id: Date.now(),
+                idDate: Date.now(),
                 firstName: currentTemplate.firstName || "",
                 lastName: currentTemplate.lastName || "",
                 middleName: currentTemplate.middleName || "",
@@ -199,13 +199,15 @@ export default function AddDocument() {
                 imageDescription: currentTemplate.imageDescription || "",
             }
             : {
-                id: Date.now(),
+                idDate: Date.now(),
                 firstName: "",
                 lastName: "",
                 middleName: "",
                 gender: "MALE",
                 birthDate: null,
                 deathDate: null,
+                uyezd: null,
+                volost: null,
                 place: null,
                 household: "",
                 landowner: null,
@@ -412,23 +414,9 @@ export default function AddDocument() {
                                                             className="absolute left-3 top-3.5 h-5 w-5 text-muted-foreground"/>
                                                     </div>
                                                 </div>
-                                                {/*<div className="space-y-2">*/}
-                                                {/*    <Label htmlFor="location" className="text-base">*/}
-                                                {/*        Место*/}
-                                                {/*    </Label>*/}
-                                                {/*    <div className="relative">*/}
-                                                {/*        <Input*/}
-                                                {/*            id="location"*/}
-                                                {/*            name="location"*/}
-                                                {/*            placeholder="Например: Москва, Россия"*/}
-                                                {/*            value={document.location}*/}
-                                                {/*            onChange={handleInputChange}*/}
-                                                {/*            className="pl-10 h-12 text-base"*/}
-                                                {/*        />*/}
-                                                {/*        <MapPin className="absolute left-3 top-3.5 h-5 w-5 text-muted-foreground" />*/}
-                                                {/*    </div>*/}
-                                                {/*</div>*/}
+
                                                 {renderParishInput("parish")}
+
                                             </>
                                         )}
                                         {step === 2 && (
@@ -498,8 +486,9 @@ export default function AddDocument() {
                                         {step === 3 && (
                                             <div className="space-y-6">
                                                 <div>
-                                                    <h3 className="text-lg font-semibold mb-2">Основная
-                                                        информация</h3>
+                                                    <h3 className="text-lg font-semibold mb-2">
+                                                        Основная информация
+                                                    </h3>
                                                     <div className="space-y-1">
                                                         <p>
                                                             <strong>Название:</strong> {document.title}
@@ -513,8 +502,9 @@ export default function AddDocument() {
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <h3 className="text-lg font-semibold mb-2">Записи
-                                                        документа</h3>
+                                                    <h3 className="text-lg font-semibold mb-2">
+                                                        Записи документа ({document.people?.length})
+                                                    </h3>
                                                     <ScrollArea className="h-[30vh] pr-4">
                                                         {document.people.map((record, index) => (
                                                             <div key={record.id}
@@ -532,10 +522,8 @@ export default function AddDocument() {
                                                                 <p>Место рождения: {record.place?.place || "Не указано"}</p>
                                                                 <p>Двор: {record.household || "Не указан"}</p>
                                                                 <p>Землевладелец: {record.landowner?.landowner || "Не указан"}</p>
-                                                                <p>Семейное
-                                                                    положение: {record.familyStatus?.familyStatus || "Не указано"}</p>
-                                                                <p>Социальный
-                                                                    статус: {record.socialStatus?.socialStatus || "Не указан"}</p>
+                                                                <p>Семейный статус: {record.familyStatus?.familyStatus || "Не указан"}</p>
+                                                                <p>Социальный статус: {record.socialStatus?.socialStatus || "Не указан"}</p>
                                                                 {record.image && (
                                                                     <div>
                                                                         <p>
@@ -553,8 +541,8 @@ export default function AddDocument() {
                                                 </div>
                                             </div>
                                         )}
+                                        {message && <p className="mt-4 text-center text-red-500">{message}</p>}
                                     </CardContent>
-                                    {message && <p className="mt-4 text-center text-red-500">{message}</p>}
                                     <CardFooter className="flex justify-between pt-2">
                                         {step > 1 && (
                                             <Button

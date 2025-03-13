@@ -48,7 +48,7 @@ public class ConfessionalDocumentService {
         return confessionalDocumentRepository.findById(id).orElseThrow(() -> new RuntimeException("Документ не найден"));
     }
 
-    public void saveDocument(ConfessionalDocument confessionalDocument) throws IOException {
+    public void saveDocument(ConfessionalDocument confessionalDocument) {
         //Сохранение людей из документа
         if (confessionalDocument.getPeople() != null) {
             confessionalDocument.getPeople().forEach(personFromDocument -> {
@@ -57,30 +57,28 @@ public class ConfessionalDocumentService {
                     fuzzyDateRepository.save(personFromDocument.getBirthDate());
                 if (personFromDocument.getDeathDate() != null)
                     fuzzyDateRepository.save(personFromDocument.getDeathDate());
+
                 personFromDocument.setDocument(confessionalDocument);
 
-                personFromDocument.setId(null);
-                personFromDocument.setDocument(confessionalDocument);
-
-                //Сохранение изображения в директорию и замена поля на путь к файлу, если строка base64
-                if (personFromDocument.getImage() != null && !personFromDocument.getImage().isEmpty()) {
-                    if (personFromDocument.getImage().startsWith("data:image")) {
-                        try {
-                            String fileName = UUID.randomUUID() + ".png";
-                            Path filePath = Paths.get(IMAGE_PATH, fileName);
-
-                            byte[] bytes = Base64.getDecoder().decode(personFromDocument.getImage());
-
-                            Files.createDirectories(filePath.getParent());
-                            Files.write(filePath, bytes);
-
-                            personFromDocument.setImage(null);
-                            personFromDocument.setImage(filePath.toString());
-                        } catch (Exception ex) {
-                            throw new RuntimeException(ex);
-                        }
-                    }
-                }
+//                //Сохранение изображения в директорию и замена поля на путь к файлу, если строка base64
+//                if (personFromDocument.getImage() != null && !personFromDocument.getImage().isEmpty()) {
+//                    if (personFromDocument.getImage().startsWith("data:image")) {
+//                        try {
+//                            String fileName = UUID.randomUUID() + ".png";
+//                            Path filePath = Paths.get(IMAGE_PATH, fileName);
+//
+//                            byte[] bytes = Base64.getDecoder().decode(personFromDocument.getImage());
+//
+//                            Files.createDirectories(filePath.getParent());
+//                            Files.write(filePath, bytes);
+//
+//                            personFromDocument.setImage(null);
+//                            personFromDocument.setImage(filePath.toString());
+//                        } catch (Exception ex) {
+//                            throw new RuntimeException(ex);
+//                        }
+//                    }
+//                }
 
             });
         }

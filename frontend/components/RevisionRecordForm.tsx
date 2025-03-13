@@ -6,71 +6,32 @@ import {Label} from "@/components/ui/label"
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
 import {Button} from "@/components/ui/button"
 import {Textarea} from "@/components/ui/textarea"
-import {Calendar, Image, Link, MapPin, PaperclipIcon, Trash2} from "lucide-react"
-import {
-    FamilyStatus,
-    FuzzyDate,
-    Landowner,
-    PersonFromConfessionalDocument,
-    Place,
-    SocialStatus,
-    Uyezd,
-    Volost
-} from "@/app/types/models"
+import {Image, Link, PaperclipIcon, Trash2} from "lucide-react"
+import {FamilyStatus, FuzzyDate, Landowner, PersonFromRevisionDocument, SocialStatus} from "@/app/types/models"
 import {autocompleteApi} from "@/app/api/api";
 
 interface RecordFormProps {
-    record: PersonFromConfessionalDocument
+    record: PersonFromRevisionDocument
     index: number
-    onRecordChange: (idDate: number, field: string, value: any, key?: keyof FuzzyDate) => void
-    onRemoveRecord: (idDate: number) => void
+    onRecordChange: (id: number, field: string, value: any, key?: keyof FuzzyDate) => void
+    onRemoveRecord: (id: number) => void
 }
 
-export function RecordForm({
-                               record,
-                               index,
-                               onRecordChange,
-                               onRemoveRecord,
-                           }: RecordFormProps) {
+export function RevisionRecordForm({
+                                       record,
+                                       index,
+                                       onRecordChange,
+                                       onRemoveRecord,
+                                   }: RecordFormProps) {
     const [showImageInput, setShowImageInput] = useState(false)
     const [imageInputType, setImageInputType] = useState<"file" | "url">("url")
     const [imagePreview, setImagePreview] = useState<string | null>(null)
-
     const [suggestions, setSuggestions] = useState({
         names: {firstName: [], lastName: [], middleName: [], landowners: []},
     });
-
-    const [uyezdy, setUyezdy] = useState<Uyezd[]>([])
-    const [volosts, setVolosts] = useState<Volost[]>([])
-    const [places, setPlaces] = useState<Place[]>([])
-
     const [familyStatuses, setFamilyStatuses] = useState<FamilyStatus[]>([])
     const [socialStatuses, setSocialStatuses] = useState<SocialStatus[]>([]);
 
-    const fetchUyezdy = async () => {
-        try {
-            const response = await autocompleteApi.getUyezdy();
-            setUyezdy(response.data || []);
-        } catch (error) {
-            console.error("Ошибка загрузки уездов:", error);
-        }
-    };
-    const fetchVolosts = async (uyezdId: number) => {
-        try {
-            const response = await autocompleteApi.getVolosts(uyezdId);
-            setVolosts(response.data || []);
-        } catch (error) {
-            console.error("Ошибка загрузки волостей:", error);
-        }
-    };
-    const fetchPlaces = async (volostId: number) => {
-        try {
-            const response = await autocompleteApi.getPlaces(volostId);
-            setPlaces(response.data || []);
-        } catch (error) {
-            console.error("Ошибка загрузки мест:", error);
-        }
-    };
     const fetchFamilyStatuses = async () => {
         try {
             const response = await autocompleteApi.getFamilyStatuses();
@@ -89,7 +50,6 @@ export function RecordForm({
     };
 
     useEffect(() => {
-        fetchUyezdy()
         fetchFamilyStatuses()
         fetchSocialStatuses()
     }, [])
@@ -107,9 +67,9 @@ export function RecordForm({
         }
     }
 
-    const handleInputChange = useCallback(async (field: keyof PersonFromConfessionalDocument, value: string) => {
+    const handleInputChange = useCallback(async (field: keyof PersonFromRevisionDocument, value: string) => {
         if (field === "landowner") {
-            onRecordChange(record.idDate!, field, { landowner: value, id: undefined, place: null }); // Обновляем как объект
+            onRecordChange(record.idDate!, field, {landowner: value, id: undefined, place: null}); // Обновляем как объект
         } else {
             onRecordChange(record.idDate!, field, value); // Обычное текстовое поле
         }
@@ -131,16 +91,15 @@ export function RecordForm({
                         response = await autocompleteApi.getLandowners(value);
                         break;
                 }
-                setSuggestions((prev) => ({ ...prev, [field]: response?.data || [] }));
+                setSuggestions((prev) => ({...prev, [field]: response?.data || []}));
             } catch (error) {
                 console.error(`Ошибка загрузки ${field}:`, error);
             }
         } else {
-            setSuggestions((prev) => ({ ...prev, [field]: [] }));
+            setSuggestions((prev) => ({...prev, [field]: []}));
         }
     }, []);
-
-    const renderSuggestionInput = (field: keyof PersonFromConfessionalDocument, label: string, label2: string) => {
+    const renderSuggestionInput = (field: keyof PersonFromRevisionDocument, label: string, label2: string) => {
         const value = record[field] as string;
 
         return (
@@ -165,6 +124,8 @@ export function RecordForm({
                                     className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                                     onClick={() => {
                                         onRecordChange(record.idDate!, field, suggestion)
+
+                                        // Скрываем все подсказки после выбора
                                         setSuggestions({
                                             names: {firstName: [], lastName: [], middleName: [], landowners: []},
                                         });
@@ -179,7 +140,7 @@ export function RecordForm({
             </div>
         )
     }
-    const renderLandownerInput = (field: keyof PersonFromConfessionalDocument, label: string, label2: string) => {
+    const renderLandownerInput = (field: keyof PersonFromRevisionDocument, label: string, label2: string) => {
         const value = (record[field] as Landowner | null)?.landowner || "";
 
         return (
@@ -205,8 +166,10 @@ export function RecordForm({
                                     className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                                     onClick={() => {
                                         onRecordChange(record.idDate!, field, suggestion);
+
+                                        // Скрываем подсказки после выбора
                                         setSuggestions({
-                                            names: { firstName: [], lastName: [], middleName: [], landowners: [] },
+                                            names: {firstName: [], lastName: [], middleName: [], landowners: []},
                                         });
                                     }}
                                 >
@@ -239,166 +202,6 @@ export function RecordForm({
     const handleGenderChange = (value: "MALE" | "FEMALE") => {
         onRecordChange(record.idDate!, "gender", value)
     }
-
-    const renderDateInput = (field: "birthDate" | "deathDate", label: string) => {
-        const date = record[field]
-
-        return (
-            <div className="space-y-2">
-                <Label className="text-base flex items-center gap-2">
-                    <Calendar className="h-4 w-4"/>
-                    {label}
-                </Label>
-                <Select
-                    value={date?.description || ""}
-                    onValueChange={(value) => handleDateChange(field, "description", value)}
-                >
-                    <SelectTrigger>
-                        <SelectValue placeholder="Выберите тип даты"/>
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="Точная дата">Точная дата</SelectItem>
-                        <SelectItem value="Диапазон">Диапазон</SelectItem>
-                        <SelectItem value="До">До</SelectItem>
-                        <SelectItem value="После">После</SelectItem>
-                        <SelectItem value="Около">Около</SelectItem>
-                    </SelectContent>
-                </Select>
-
-                {["До", "После", "Около", "Точная дата"].includes(date?.description || "") && (
-                    <Input
-                        type="date"
-                        required={true}
-                        value={date?.exactDate || ""}
-                        onChange={(e) => handleDateChange(field, "exactDate", e.target.value)}
-                        className="mt-2"
-                    />
-                )}
-
-                {date?.description === "Диапазон" && (
-                    <div className="mt-2 flex gap-2">
-                        <Input
-                            type="date"
-                            placeholder="Начальная дата"
-                            required={true}
-                            value={date.startDate || ""}
-                            onChange={(e) => handleDateChange(field, "startDate", e.target.value)}
-                        />
-                        <Input
-                            type="date"
-                            placeholder="Конечная дата"
-                            required={true}
-                            value={date.endDate || ""}
-                            onChange={(e) => handleDateChange(field, "endDate", e.target.value)}
-                        />
-                    </div>
-                )}
-
-            </div>
-        )
-    }
-    const handleDateChange = (field: "birthDate" | "deathDate", key: keyof FuzzyDate, value: string) => {
-        onRecordChange(record.idDate!, field, value, key)
-    }
-
-    const renderLocationSelectors = () => {
-        return (
-            <div className="space-y-2">
-
-                <Label className="text-base flex items-center gap-2">
-                    <MapPin className="h-4 w-4"/>
-                    Место рождения
-                </Label>
-
-                {/* Уезд */}
-                <Select
-                    value={record.uyezd?.id?.toString() || ""}
-                    onValueChange={(value) => {
-                        const selectedUyezd = uyezdy.find((u) => u.id?.toString() === value) || null;
-                        onRecordChange(record.idDate!, "uyezd", selectedUyezd)
-
-                        onRecordChange(record.idDate!, "volost", null)
-                        onRecordChange(record.idDate!, "place", null)
-                        fetchVolosts(selectedUyezd?.id)
-                    }}
-                >
-                    <SelectTrigger>
-                        <SelectValue placeholder="Выберите уезд"/>
-                    </SelectTrigger>
-                    <SelectContent>
-                        {uyezdy.length > 0 ? (
-                            uyezdy.map((uyezd) => (
-                                <SelectItem key={uyezd.id} value={uyezd.id?.toString() || ""}>
-                                    {uyezd.uyezd}
-                                </SelectItem>
-                            ))
-                        ) : (
-                            <SelectItem key="loading" value="loading" disabled>
-                                Уезды не найдены
-                            </SelectItem>
-                        )}
-                    </SelectContent>
-                </Select>
-
-                {/* Волость */}
-                <Select
-                    value={record.volost?.id?.toString() || ""}
-                    onValueChange={(value) => {
-                        const selectedVolost = volosts.find((v) => v.id?.toString() === value) || null;
-                        onRecordChange(record.idDate!, "volost", selectedVolost)
-
-                        onRecordChange(record.idDate!, "place", null)
-                        fetchPlaces(selectedVolost?.id)
-                    }}
-                >
-                    <SelectTrigger>
-                        <SelectValue placeholder="Выберите волость"/>
-                    </SelectTrigger>
-                    <SelectContent>
-                        {record.uyezd && volosts.length > 0 ? (
-                            volosts
-                                .map((volost) => (
-                                    <SelectItem key={volost.id} value={volost.id?.toString() || ""}>
-                                        {volost.volost}
-                                    </SelectItem>
-                                ))
-                        ) : (
-                            <SelectItem key="loading" value="loading" disabled>
-                                Волости не найдены
-                            </SelectItem>
-                        )}
-                    </SelectContent>
-                </Select>
-
-                {/* Место */}
-                <Select
-                    value={record.place?.id?.toString() || ""}
-                    onValueChange={(value) => {
-                        const selectedPlace = places.find((p) => p.id?.toString() === value) || null;
-                        onRecordChange(record.idDate!, "place", selectedPlace)
-                    }}
-                >
-                    <SelectTrigger>
-                        <SelectValue placeholder="Выберите место"/>
-                    </SelectTrigger>
-                    <SelectContent>
-                        {record.volost && places.length > 0 ? (
-                            places
-                                .map((place) => (
-                                    <SelectItem key={place.id} value={place.id?.toString() || ""}>
-                                        {place.place}
-                                    </SelectItem>
-                                ))
-                        ) : (
-                            <SelectItem key="loading" value="loading" disabled>
-                                Места не найдены
-                            </SelectItem>
-                        )}
-                    </SelectContent>
-                </Select>
-            </div>
-        );
-    };
 
     const renderStatusInput = (field: "familyStatus" | "socialStatus") => {
         const isFamily = field === "familyStatus";
@@ -461,9 +264,29 @@ export function RecordForm({
             {renderSuggestionInput("firstName", "Имя", "имя")}
             {renderSuggestionInput("middleName", "Отчество", "отчество")}
             {renderGenderInput()}
-            {renderDateInput("birthDate", "Дата рождения")}
-            {renderDateInput("deathDate", "Дата смерти")}
-            {renderLocationSelectors()}
+            <div className="space-y-2">
+                <Label htmlFor="previousAge" className="text-base">Возраст в предыдущей ревизии</Label>
+                <Input
+                    id="previousAge"
+                    type="number"
+                    placeholder={'Введите возраст'}
+                    value={record.previousAge}
+                    min="0"
+                    onChange={(e) => onRecordChange(record.idDate!, "previousAge", e.target.value)}
+                />
+            </div>
+
+            <div className="space-y-2">
+                <Label htmlFor="currentAge" className="text-base">Текущий возраст</Label>
+                <Input
+                    id="currentAge"
+                    type="number"
+                    placeholder={'Введите возраст'}
+                    value={record.currentAge}
+                    min="0"
+                    onChange={(e) => onRecordChange(record.idDate!, "currentAge", e.target.value)}
+                />
+            </div>
 
             <div className="space-y-2">
                 <Label htmlFor={`household-${record.idDate}`} className="text-base">
@@ -474,13 +297,58 @@ export function RecordForm({
                     placeholder={'Введите двор'}
                     value={record.household || ""}
                     onChange={(e) => onRecordChange(record.idDate!, "household", e.target.value)}
-                    className="h-10 text-base"
                 />
             </div>
 
             {renderLandownerInput("landowner", "Землевладелец", "имя землевладельца")}
             {renderStatusInput("familyStatus")}
             {renderStatusInput("socialStatus")}
+
+            <div className="space-y-2">
+                <Label htmlFor={`departureYear-${record.idDate}`} className="text-base">
+                    Год отъезда
+                </Label>
+                <Input
+                    id={`departureYear-${record.idDate}`}
+                    type="number"
+                    placeholder="Введите год отъезда"
+                    value={record.departureYear || ""}
+                    min="0"
+                    onChange={(e) => onRecordChange(record.idDate!, "departureYear", e.target.value)}
+                    className="h-10 text-base"
+                />
+            </div>
+
+            <div className="space-y-2">
+                <Label htmlFor={`departureReason-${record.idDate}`} className="text-base">
+                    Причина отъезда
+                </Label>
+                <Input
+                    id={`departureReason-${record.idDate}`}
+                    placeholder="Введите причину отъезда"
+                    value={record.departureReason || ""}
+                    onChange={(e) => onRecordChange(record.idDate!, "departureReason", e.target.value)}
+                    className="h-10 text-base"
+                />
+            </div>
+
+            {record.gender === "FEMALE" && (
+                <div className="space-y-2">
+                    <Label htmlFor={`marriageDocument-${record.idDate}`} className="text-base">
+                        Документ о браке
+                    </Label>
+                    <div className="flex items-center space-x-2">
+                        <Input
+                            id={`marriageDocument-${record.idDate}`}
+                            type="checkbox"
+                            checked={record.marriageDocument || false}
+                            onChange={(e) => onRecordChange(record.idDate!, "marriageDocument", e.target.checked)}
+                            className="h-5 w-5"
+                        />
+                        <span className="text-base">Есть документ</span>
+                    </div>
+                </div>
+            )}
 
             {!showImageInput && (
                 <Button type="button" variant="outline" onClick={() => setShowImageInput(true)} className="w-full">

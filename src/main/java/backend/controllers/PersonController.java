@@ -17,7 +17,10 @@ public class PersonController {
     private final PersonService personService;
 
     @GetMapping("/get-all")
-    public ResponseEntity<?> getAllPeople(@RequestParam(name = "str", required = false) String str) {
+    public ResponseEntity<?> getAllPeople(@RequestParam(name = "str", required = false) String str,
+                                          @RequestParam(name = "uyezdId", required = false) Long uyezdId,
+                                          @RequestParam(name = "from", required = false) String from,
+                                          @RequestParam(name = "to", required = false) String to) {
         log.info("Отправлен запрос на получение всех людей");
         return ResponseEntity.ok(personService.getAllPeople(str));
     }

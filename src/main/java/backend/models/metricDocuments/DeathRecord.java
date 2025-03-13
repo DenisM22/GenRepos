@@ -27,6 +27,10 @@ public class DeathRecord {
     @Column(name = "middle_name")
     private String middleName;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "gender")
+    private Gender gender;
+
     @Column(name = "age")
     private Short age;
 

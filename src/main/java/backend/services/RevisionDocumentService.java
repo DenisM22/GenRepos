@@ -1,6 +1,7 @@
 package backend.services;
 
 import backend.dto.DocumentLightDto;
+import backend.models.confessionalDocuments.ConfessionalDocument;
 import backend.models.revisionDocuments.RevisionDocument;
 import backend.repositories.*;
 import backend.repositories.RevisionDocumentRepository;
@@ -41,17 +42,12 @@ public class RevisionDocumentService {
         return revisionDocumentRepository.findById(id).orElseThrow(() -> new RuntimeException("Документ не найден"));
     }
 
-    public void saveDocument(RevisionDocument revisionDocument) throws IOException {
-//        //Сохранение изображения в директорию и замена поля на путь к файлу
-//        if (revisionDocument.getFile() != null && !revisionDocument.getFile().isEmpty()) {
-//            String fileName = UUID.randomUUID() + ".png";
-//            Path filePath = Paths.get(IMAGE_PATH, fileName);
-//
-//            Files.createDirectories(filePath.getParent());
-//            Files.write(filePath, Base64.getDecoder().decode(revisionDocument.getFile()));
-//            revisionDocument.setFile(null);
-//            revisionDocument.setFile(filePath.toString());
-//        }
+    public void saveDocument(RevisionDocument revisionDocument) {
+        //Сохранение людей из документа
+        if (revisionDocument.getPeople() != null) {
+            revisionDocument.getPeople().forEach(personFromDocument ->
+                    personFromDocument.setDocument(revisionDocument));
+        }
 
         revisionDocumentRepository.save(revisionDocument);
     }

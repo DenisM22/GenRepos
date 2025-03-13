@@ -2,6 +2,7 @@ package backend.services;
 
 import backend.dto.DocumentLightDto;
 import backend.models.metricDocuments.MetricDocument;
+import backend.repositories.FuzzyDateRepository;
 import backend.repositories.MetricDocumentRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -25,6 +26,7 @@ public class MetricDocumentService {
     private final ModelMapper modelMapper;
     private final int SIZE = 1;
     private final String IMAGE_PATH = "C:\\Program Files\\PostgreSQL\\17\\data\\images\\MetricDocuments";
+    private final FuzzyDateRepository fuzzyDateRepository;
 
     public List<DocumentLightDto> getDocumentsStartingWith(String str) {
         List<MetricDocument> metricDocuments;
@@ -40,17 +42,31 @@ public class MetricDocumentService {
         return metricDocumentRepository.findById(id).orElseThrow(() -> new RuntimeException("Документ не найден"));
     }
 
-    public void saveDocument(MetricDocument metricDocument) throws IOException {
-//        //Сохранение изображения в директорию и замена поля на путь к файлу
-//        if (metricDocument.getFile() != null && !metricDocument.getFile().isEmpty()) {
-//            String fileName = UUID.randomUUID() + ".png";
-//            Path filePath = Paths.get(IMAGE_PATH, fileName);
-//
-//            Files.createDirectories(filePath.getParent());
-//            Files.write(filePath, Base64.getDecoder().decode(metricDocument.getFile()));
-//            metricDocument.setFile(null);
-//            metricDocument.setFile(filePath.toString());
-//        }
+    public void saveDocument(MetricDocument metricDocument) {
+        
+        if (metricDocument.getBirthRecords() != null) {
+            metricDocument.getBirthRecords().forEach(record -> {
+                if (record.getBirthDate() != null)
+                    fuzzyDateRepository.save(record.getBirthDate());
+                record.setDocument(metricDocument);
+            });
+        }
+
+        if (metricDocument.getMarriageRecords() != null) {
+            metricDocument.getMarriageRecords().forEach(record -> {
+                if (record.getMarriageDate() != null)
+                    fuzzyDateRepository.save(record.getMarriageDate());
+                record.setDocument(metricDocument);
+            });
+        }
+
+        if (metricDocument.getDeathRecords() != null) {
+            metricDocument.getDeathRecords().forEach(record -> {
+                if (record.getDeathDate() != null)
+                    fuzzyDateRepository.save(record.getDeathDate());
+                record.setDocument(metricDocument);
+            });
+        }
 
         metricDocumentRepository.save(metricDocument);
     }

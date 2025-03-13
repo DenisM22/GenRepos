@@ -159,25 +159,6 @@ CREATE TABLE IF NOT EXISTS birth_records (
     image_description VARCHAR
 );
 
-CREATE TABLE IF NOT EXISTS death_records (
-    id BIGSERIAL PRIMARY KEY,
-    document_id BIGINT NOT NULL REFERENCES metric_documents(id),
-
-    first_name VARCHAR(255),
-    last_name VARCHAR(255),
-    middle_name VARCHAR(255),
-    age SMALLINT,
-    death_date BIGINT REFERENCES fuzzy_dates(id),
-    place_id BIGINT REFERENCES places(id),
-    family_status_id BIGINT REFERENCES family_statuses(id),
-    social_status_id BIGINT REFERENCES social_statuses(id),
-    death_cause VARCHAR(255),
-    burial_place_id BIGINT REFERENCES places(id),
-
-    image VARCHAR,
-    image_description VARCHAR
-);
-
 CREATE TABLE IF NOT EXISTS marriage_records (
     id BIGSERIAL PRIMARY KEY,
     document_id BIGINT NOT NULL REFERENCES metric_documents(id),
@@ -227,6 +208,26 @@ CREATE TABLE IF NOT EXISTS marriage_records (
     image VARCHAR,
     image_description VARCHAR
     );
+
+CREATE TABLE IF NOT EXISTS death_records (
+    id BIGSERIAL PRIMARY KEY,
+    document_id BIGINT NOT NULL REFERENCES metric_documents(id),
+
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
+    middle_name VARCHAR(255),
+    gender VARCHAR(10),
+    age SMALLINT,
+    death_date BIGINT REFERENCES fuzzy_dates(id),
+    place_id BIGINT REFERENCES places(id),
+    family_status_id BIGINT REFERENCES family_statuses(id),
+    social_status_id BIGINT REFERENCES social_statuses(id),
+    death_cause VARCHAR(255),
+    burial_place_id BIGINT REFERENCES places(id),
+
+    image VARCHAR,
+    image_description VARCHAR
+);
 
 --Исповедная ведомость
 CREATE TABLE IF NOT EXISTS confessional_documents (

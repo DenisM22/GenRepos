@@ -7,7 +7,7 @@ export const api = axios.create({
 })
 
 export const metricDocumentApi = {
-  getAll: (str?: string, page = 0) => api.get(`/metric-document/get-all`, { params: { str, page } }),
+  getAll: (str?: string, from?: number, to?: number, page = 0) => api.get(`/metric-document/get-all`, { params: { str, page } }),
   getById: (id: number) => api.get(`/metric-document/get/${id}`),
   save: (document: any) =>
     api.post("/metric-document/save", document, {
@@ -16,7 +16,7 @@ export const metricDocumentApi = {
 }
 
 export const confessionalDocumentApi = {
-  getAll: (str?: string, page = 0) => api.get(`/confessional-document/get-all`, { params: { str, page } }),
+  getAll: (str?: string, from?: number, to?: number, page = 0) => api.get(`/confessional-document/get-all`, { params: { str, page } }),
   getById: (id: number) => api.get(`/confessional-document/get/${id}`),
   save: (document: any) =>
       api.post("/confessional-document/save", document, {
@@ -25,7 +25,7 @@ export const confessionalDocumentApi = {
 }
 
 export const revisionDocumentApi = {
-  getAll: (str?: string, page = 0) => api.get(`/revision-document/get-all`, { params: { str, page } }),
+  getAll: (str?: string, from?: number, to?: number, page = 0) => api.get(`/revision-document/get-all`, { params: { str, page } }),
   getById: (id: number) => api.get(`/revision-document/get/${id}`),
   save: (document: any) =>
       api.post("/revision-document/save", document, {
@@ -34,7 +34,7 @@ export const revisionDocumentApi = {
 }
 
 export const personApi = {
-  getAll: (str?: string, page = 0) => api.get(`/person/get-all`, { params: { str, page } }),
+  getAll: (str?: string, uyezdId?: number, from?: number, to?: number, page = 0) => api.get(`/person/get-all`, { params: { str, page } }),
   getById: (id: number) => api.get(`/person/get/${id}`),
   save: (person: any) =>
     api.post("/person/save", person, {

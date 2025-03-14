@@ -12,7 +12,7 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
 
     List<Person> findAllByLastNameStartingWithIgnoreCase(String str);
 
-    List<Person> findAllByPlace_Volost_Uyezd_IdAndBirthDate_ExactDate_YearBetweenAndFirstNameStartingWithIgnoreCaseOrLastNameStartingWithIgnoreCase
-            (Long uyezdId, int from, int to, String firstName, String lastName);
+//    List<Person> findAllByPlace_Volost_Uyezd_IdAndBirthDate_ExactDate_YearBetweenAndFirstNameStartingWithIgnoreCaseOrLastNameStartingWithIgnoreCase
+//            (Long uyezdId, int from, int to, String firstName, String lastName);
 
 }

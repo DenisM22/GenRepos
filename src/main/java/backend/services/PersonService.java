@@ -20,12 +20,14 @@ public class PersonService {
     private final PersonRepository personRepository;
     private final ModelMapper modelMapper;
 
-    public List<PersonLightDto> getAllPeople(String str) {
+    public List<PersonLightDto> getAllPeople(String str, Long uyezdId, Integer from, Integer to) {
         List<Person> people;
-        if (str == null || str.isEmpty())
+        if ((str == null || str.isEmpty()) && uyezdId == null && from == null && to == null)
             people = personRepository.findAll();
         else
-            people = personRepository.findAllByLastNameStartingWithIgnoreCase(str);
+            people = personRepository.findAllByLastNameStartingWithIgnoreCase
+                    (str);
+
         return people.stream().map(person -> modelMapper.map(person, PersonLightDto.class)).toList();
     }
 

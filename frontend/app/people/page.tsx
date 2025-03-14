@@ -14,29 +14,30 @@ import {AxiosError} from "axios"
 import { YearRangeFilter } from "@/components/YearRangeFilter"
 
 const uyezdOptions = [
-  { value: "velskiy", label: "Вельский" },
-  { value: "vologodskiy", label: "Вологодский" },
-  { value: "gryazovetskiy", label: "Грязовецкий" },
-  { value: "kadnikovskiy", label: "Кадниковский" },
-  { value: "nikolskiy", label: "Никольский" },
-  { value: "solvychegodskiy", label: "Сольвычегодский" },
-  { value: "totemskiy", label: "Тотемский" },
-  { value: "ust-sysolskiy", label: "Усть-Сысольский" },
-  { value: "ustyuzhskiy", label: "Устюжский" },
-  { value: "yarenskiy", label: "Яренский" },
+  { value: "1", label: "Вельский" },
+  { value: "2", label: "Вологодский" },
+  { value: "3", label: "Грязовецкий" },
+  { value: "4", label: "Кадниковский" },
+  { value: "5", label: "Никольский" },
+  { value: "6", label: "Сольвычегодский" },
+  { value: "7", label: "Тотемский" },
+  { value: "8", label: "Усть-Сысольский" },
+  { value: "9", label: "Устюжский" },
+  { value: "10", label: "Яренский" },
 ]
 
 export default function PeoplePage() {
   const [message, setMessage] = useState('')
   const [people, setPeople] = useState<Person[]>([])
   const [query, setQuery] = useState("")
-  const [selectedUyezd, setSelectedUyezd] = useState("")
-  const [startBirthYear, setStartBirthYear] = useState("")
-  const [endBirthYear, setEndBirthYear] = useState("")
+
+  const [selectedUyezd, setSelectedUyezd] = useState<number>()
+  const [startBirthYear, setStartBirthYear] = useState<number>()
+  const [endBirthYear, setEndBirthYear] = useState<number>()
 
   const fetchPeople = async () => {
     try {
-      const response = await personApi.getAll(query)
+      const response = await personApi.getAll(query, selectedUyezd, startBirthYear, endBirthYear)
       setPeople(response.data)
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
@@ -92,7 +93,6 @@ export default function PeoplePage() {
           </div>
 
           {message && <p className="mt-4 text-center text-red-500">{message}</p>}
-
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {people.map((person) => (

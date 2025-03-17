@@ -1,6 +1,7 @@
 package backend.models.metricDocuments;
 
 import backend.models.references.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,6 +17,7 @@ public class DeathRecord {
 
     @ManyToOne
     @JoinColumn(name = "document_id", nullable = false)
+    @JsonIgnore
     private MetricDocument document;
 
     @Column(name = "first_name")

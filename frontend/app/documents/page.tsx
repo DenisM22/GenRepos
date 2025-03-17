@@ -8,70 +8,75 @@ import { SearchBar } from "@/components/search-bar"
 import { FilterDropdown } from "@/components/filter-dropdown"
 import Header from "@/components/header"
 import {Calendar, Church, FileText, MapPin, Plus, Search} from "lucide-react"
-import type {ConfessionalDocument, MetricDocument, RevisionDocument} from "@/app/types/models";
+import type {Document} from "@/app/types/models";
 import { metricDocumentApi, confessionalDocumentApi, revisionDocumentApi } from "@/app/api/api"
 import { AxiosError } from "axios"
 import { YearRangeFilter } from "@/components/YearRangeFilter"
 
 const documentTypes = [
   { value: "metric", label: "Метрическая книга" },
-  { value: "confession", label: "Исповедная ведомость" },
+  { value: "confessional", label: "Исповедная ведомость" },
   { value: "revision", label: "Ревизская сказка" },
-]
-
-const yearOptions = [
-  { value: "1900-1950", label: "1900-1950" },
-  { value: "1951-2000", label: "1951-2000" },
-  { value: "2001-present", label: "2001-настоящее время" },
 ]
 
 export default function DocumentsPage() {
   const [message, setMessage] = useState('')
-  const [documents, setDocuments] = useState<MetricDocument[] | ConfessionalDocument[] | RevisionDocument[]>([])
+  const [documents, setDocuments] = useState<Document[]>([])
   const [query, setQuery] = useState("")
 
-  const [selectedType, setSelectedType] = useState("")
+  const [selectedType, setSelectedType] = useState("all")
   const [startYear, setStartYear] = useState("")
   const [endYear, setEndYear] = useState("")
 
   const fetchDocuments = async () => {
     try {
-      let response
+      setMessage("");
+      let response;
       switch (selectedType) {
-        case null:
+        case "all":
           const [metricResponse, confessionalResponse, revisionResponse] = await Promise.all([
             metricDocumentApi.getAll(query, startYear, endYear),
             confessionalDocumentApi.getAll(query, startYear, endYear),
-            revisionDocumentApi.getAll(query, startYear, endYear)
+            revisionDocumentApi.getAll(query, startYear, endYear),
           ]);
 
           setDocuments([
-            ...(metricResponse?.data || []),
-            ...(confessionalResponse?.data || []),
-            ...(revisionResponse?.data || [])
+            ...(metricResponse?.data?.map((doc: Document) => ({ ...doc, type: "metric" })) || []),
+            ...(confessionalResponse?.data?.map((doc: Document) => ({ ...doc, type: "confessional" })) || []),
+            ...(revisionResponse?.data?.map((doc: Document) => ({ ...doc, type: "revision" })) || []),
           ]);
-        case "metric":
-          response = await metricDocumentApi.getAll(query)
-          setDocuments(response)
-        case "confessional":
-          response = await confessionalDocumentApi.getAll(query)
-          setDocuments(response)
-        case "revision":
-          response = await revisionDocumentApi.getAll(query)
-          setDocuments(response)
-      }
+          break;
 
+        case "metric":
+          response = await metricDocumentApi.getAll(query, startYear, endYear);
+          setDocuments(response?.data?.map((doc: Document) => ({ ...doc, type: "metric" })) || []);
+          break;
+
+        case "confessional":
+          response = await confessionalDocumentApi.getAll(query, startYear, endYear);
+          setDocuments(response?.data?.map((doc: Document) => ({ ...doc, type: "confessional" })) || []);
+          break;
+
+        case "revision":
+          response = await revisionDocumentApi.getAll(query, startYear, endYear);
+          setDocuments(response?.data?.map((doc: Document) => ({ ...doc, type: "revision" })) || []);
+          break;
+
+        default:
+          setDocuments([]);
+          break;
+      }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        setDocuments([]); // В случае ошибки очищаем список
-        console.error(error.response?.data)
-        setMessage('Ошибка при загрузке документов: ' + (error.response?.data?.message || error.message))
+        setDocuments([]);
+        console.error(error.response?.data);
+        setMessage("Ошибка при загрузке документов: " + (error.response?.data?.message || error.message));
       } else {
-        console.error(error)
-        setMessage('Неизвестная ошибка')
+        console.error(error);
+        setMessage("Неизвестная ошибка");
       }
     }
-  }
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -79,7 +84,10 @@ export default function DocumentsPage() {
   }
 
   const handleTypeSelect = (value: string) => {
-    setSelectedType(value)
+    if (selectedType == value)
+      setSelectedType("all")
+    else
+      setSelectedType(value)
   }
 
   const handleYearRangeChange = (start: string, end: string) => {
@@ -119,7 +127,7 @@ export default function DocumentsPage() {
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {documents.map((doc) => (
-                <Link href={`/documents/${doc.id}`} key={doc.id}>
+                <Link href={`/documents/${doc.type}/${doc.id}`} key={doc.id}>
                   <Card className="hover:shadow-md transition-shadow h-full">
                     <CardHeader className="pb-2">
                       <CardTitle className="flex items-center gap-2">
@@ -131,7 +139,7 @@ export default function DocumentsPage() {
                       <div className="space-y-2">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <Calendar className="h-4 w-4 flex-shrink-0" />
-                          <span>Год: {doc.createdAt}</span>
+                          <span>Год создания: {doc.createdAt}</span>
                         </div>
 
                         {doc.parish && (
@@ -144,14 +152,10 @@ export default function DocumentsPage() {
                         {doc.place && (
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                               <MapPin className="h-4 w-4 flex-shrink-0" />
-                              <span>Место: {doc.place.place}</span>
+                              <span>Место: {doc.place.volost.uyezd.uyezd} уезд, {doc.place.volost.volost}, {doc.place.place}</span>
                             </div>
                         )}
 
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <FileText className="h-4 w-4 flex-shrink-0" />
-                          <span>Тип: {documentTypes.find((t) => t.value === doc.type)?.label}</span>
-                        </div>
                       </div>
                     </CardContent>
                   </Card>

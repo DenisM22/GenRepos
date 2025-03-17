@@ -9,6 +9,9 @@ import java.util.List;
 @Repository
 public interface MetricDocumentRepository extends JpaRepository<MetricDocument, Long> {
 
-    List<MetricDocument> findAllByTitleContainingIgnoreCase(String str);
+    List<MetricDocument> findAllByTitleContainingIgnoreCaseOrderByTitle(String title);
+
+    List<MetricDocument> findAllByTitleContainingIgnoreCaseAndCreatedAtBetweenOrderByTitle
+            (String title, Short createdAt, Short createdAt2);
 
 }

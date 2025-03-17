@@ -258,3 +258,12 @@ export interface TemplateRevision extends Omit<PersonFromRevisionDocument, "id" 
   id: string
   name: string
 }
+
+export interface Document {
+  id?: number
+  title?: string
+  createdAt?: number
+  parish?: Parish | null
+  place?: Place | null
+  type?: MetricDocument| ConfessionalDocument | RevisionDocument
+}

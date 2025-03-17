@@ -515,9 +515,15 @@ export default function AddDocument() {
                                                                 <p>Пол: {record.gender === "MALE" ? "Мужской" : "Женский"}</p>
                                                                 <p>
                                                                     Дата рождения:{" "}
-                                                                    {record.birthDate
-                                                                        ? `${record.birthDate.description}-${record.birthDate.exactDate}`
-                                                                        : "Не указана"}
+                                                                    {record.birthDate ? (
+                                                                        record.birthDate.description === "Диапазон" ? (
+                                                                            `между ${record.birthDate.startDate} и ${record.birthDate.endDate}`
+                                                                        ) : (
+                                                                            record.birthDate.description.toLowerCase() + " " + record.birthDate.exactDate
+                                                                        )
+                                                                    ) : (
+                                                                        "Не указана"
+                                                                    )}
                                                                 </p>
                                                                 <p>Место рождения: {record.place?.place || "Не указано"}</p>
                                                                 <p>Двор: {record.household || "Не указан"}</p>

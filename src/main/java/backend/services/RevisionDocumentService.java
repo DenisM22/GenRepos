@@ -6,7 +6,9 @@ import backend.models.revisionDocuments.RevisionDocument;
 import backend.repositories.*;
 import backend.repositories.RevisionDocumentRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,18 +30,29 @@ public class RevisionDocumentService {
     private final int SIZE = 1;
     private final String IMAGE_PATH = "C:\\Program Files\\PostgreSQL\\17\\data\\images\\RevisionDocuments";
 
-    public List<DocumentLightDto> getDocumentsStartingWith(String str) {
+    public List<DocumentLightDto> getAllDocuments(String str, Short from, Short to) {
         List<RevisionDocument> revisionDocuments;
-        if (str == null || str.isEmpty())
-            revisionDocuments = revisionDocumentRepository.findAll();
-        else
-            revisionDocuments = revisionDocumentRepository.findAllByTitleContainingIgnoreCase(str);
+        if ((str == null || str.isBlank()) && from == null && to == null)
+            revisionDocuments = revisionDocumentRepository.findAll(Sort.by("title"));
+        else if ((str != null && !str.isBlank()) && from == null && to == null)
+            revisionDocuments = revisionDocumentRepository.findAllByTitleContainingIgnoreCaseOrderByTitle(str);
+        else {
+            if (from == null)
+                from = 0;
+            if (to == null)
+                to = 3000;
+            revisionDocuments = revisionDocumentRepository.findAllByTitleContainingIgnoreCaseAndCreatedAtBetweenOrderByTitle
+                    (str, from, to);
+        }
+
         return revisionDocuments.stream().map(document ->
                 modelMapper.map(document, DocumentLightDto.class)).toList();
     }
 
     public RevisionDocument getDocumentById(Long id) {
-        return revisionDocumentRepository.findById(id).orElseThrow(() -> new RuntimeException("Документ не найден"));
+        RevisionDocument document = revisionDocumentRepository.findById(id).orElseThrow(() -> new RuntimeException("Документ не найден"));
+        Hibernate.initialize(document.getPeople());
+        return document;
     }
 
     public void saveDocument(RevisionDocument revisionDocument) {

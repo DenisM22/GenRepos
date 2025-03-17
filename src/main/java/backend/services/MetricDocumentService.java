@@ -5,7 +5,9 @@ import backend.models.metricDocuments.MetricDocument;
 import backend.repositories.FuzzyDateRepository;
 import backend.repositories.MetricDocumentRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,18 +30,30 @@ public class MetricDocumentService {
     private final String IMAGE_PATH = "C:\\Program Files\\PostgreSQL\\17\\data\\images\\MetricDocuments";
     private final FuzzyDateRepository fuzzyDateRepository;
 
-    public List<DocumentLightDto> getDocumentsStartingWith(String str) {
+    public List<DocumentLightDto> getAllDocuments(String str, Short from, Short to) {
         List<MetricDocument> metricDocuments;
-        if (str == null || str.isEmpty())
-            metricDocuments = metricDocumentRepository.findAll();
-        else
-            metricDocuments = metricDocumentRepository.findAllByTitleContainingIgnoreCase(str);
+        if ((str == null || str.isBlank()) && from == null && to == null)
+            metricDocuments = metricDocumentRepository.findAll(Sort.by("title"));
+        else if ((str != null && !str.isBlank()) && from == null && to == null)
+            metricDocuments = metricDocumentRepository.findAllByTitleContainingIgnoreCaseOrderByTitle(str);
+        else {
+            if (from == null)
+                from = 0;
+            if (to == null)
+                to = 3000;
+            metricDocuments = metricDocumentRepository.findAllByTitleContainingIgnoreCaseAndCreatedAtBetweenOrderByTitle(str, from, to);
+        }
+
         return metricDocuments.stream().map(document ->
                 modelMapper.map(document, DocumentLightDto.class)).toList();
     }
 
     public MetricDocument getDocumentById(Long id) {
-        return metricDocumentRepository.findById(id).orElseThrow(() -> new RuntimeException("Документ не найден"));
+        MetricDocument document = metricDocumentRepository.findById(id).orElseThrow(() -> new RuntimeException("Документ не найден"));
+        Hibernate.initialize(document.getBirthRecords());
+        Hibernate.initialize(document.getMarriageRecords());
+        Hibernate.initialize(document.getDeathRecords());
+        return document;
     }
 
     public void saveDocument(MetricDocument metricDocument) {

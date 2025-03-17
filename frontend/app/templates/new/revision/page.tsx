@@ -294,7 +294,7 @@ export default function AddTemplate() {
                                         id="previousAge"
                                         type="number"
                                         placeholder={'Введите возраст'}
-                                        value={template.previousAge}
+                                        value={template.previousAge || ""}
                                         min="0"
                                         onChange={(e) => setTemplate((prev) => ({
                                             ...prev,
@@ -309,7 +309,7 @@ export default function AddTemplate() {
                                         id="currentAge"
                                         type="number"
                                         placeholder={'Введите возраст'}
-                                        value={template.currentAge}
+                                        value={template.currentAge || ""}
                                         min="0"
                                         onChange={(e) => setTemplate((prev) => ({...prev, currentAge: e.target.value}))}
                                     />

@@ -7,35 +7,35 @@ export const api = axios.create({
 })
 
 export const metricDocumentApi = {
-  getAll: (str?: string, from?: number, to?: number, page = 0) => api.get(`/metric-document/get-all`, { params: { str, page } }),
-  getById: (id: number) => api.get(`/metric-document/get/${id}`),
+  getAll: (str?: string, from?: number, to?: number, page = 0) => api.get(`/document/metric/get-all`, { params: { str, page, from, to } }),
+  getById: (id: string | string[]) => api.get(`/document/metric/get/${id}`),
   save: (document: any) =>
-    api.post("/metric-document/save", document, {
+    api.post("/document/metric/save", document, {
       headers: { "Content-Type": "application/json" },
     }),
 }
 
 export const confessionalDocumentApi = {
-  getAll: (str?: string, from?: number, to?: number, page = 0) => api.get(`/confessional-document/get-all`, { params: { str, page } }),
-  getById: (id: number) => api.get(`/confessional-document/get/${id}`),
+  getAll: (str?: string, from?: number, to?: number, page = 0) => api.get(`/document/confessional/get-all`, { params: { str, page, from, to } }),
+  getById: (id: string | string[]) => api.get(`/document/confessional/get/${id}`),
   save: (document: any) =>
-      api.post("/confessional-document/save", document, {
+      api.post("/document/confessional/save", document, {
         headers: { "Content-Type": "application/json" },
       }),
 }
 
 export const revisionDocumentApi = {
-  getAll: (str?: string, from?: number, to?: number, page = 0) => api.get(`/revision-document/get-all`, { params: { str, page } }),
-  getById: (id: number) => api.get(`/revision-document/get/${id}`),
+  getAll: (str?: string, from?: number, to?: number, page = 0) => api.get(`/document/revision/get-all`, { params: { str, page, from, to } }),
+  getById: (id: string | string[]) => api.get(`/document/revision/get/${id}`),
   save: (document: any) =>
-      api.post("/revision-document/save", document, {
+      api.post("/document/revision/save", document, {
         headers: { "Content-Type": "application/json" },
       }),
 }
 
 export const personApi = {
-  getAll: (str?: string, uyezdId?: number, from?: number, to?: number, page = 0) => api.get(`/person/get-all`, { params: { str, page } }),
-  getById: (id: number) => api.get(`/person/get/${id}`),
+  getAll: (str?: string, uyezdId?: number, from?: number, to?: number, page = 0) => api.get(`/person/get-all`, { params: { str, page, uyezdId, from, to } }),
+  getById: (id: string | string[]) => api.get(`/person/get/${id}`),
   save: (person: any) =>
     api.post("/person/save", person, {
       headers: { "Content-Type": "application/json" },

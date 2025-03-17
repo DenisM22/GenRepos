@@ -270,7 +270,7 @@ export function RevisionRecordForm({
                     id="previousAge"
                     type="number"
                     placeholder={'Введите возраст'}
-                    value={record.previousAge}
+                    value={record.previousAge || ""}
                     min="0"
                     onChange={(e) => onRecordChange(record.idDate!, "previousAge", e.target.value)}
                 />
@@ -282,7 +282,7 @@ export function RevisionRecordForm({
                     id="currentAge"
                     type="number"
                     placeholder={'Введите возраст'}
-                    value={record.currentAge}
+                    value={record.currentAge || ""}
                     min="0"
                     onChange={(e) => onRecordChange(record.idDate!, "currentAge", e.target.value)}
                 />

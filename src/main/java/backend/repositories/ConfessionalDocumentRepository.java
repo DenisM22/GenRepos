@@ -9,6 +9,9 @@ import java.util.List;
 @Repository
 public interface ConfessionalDocumentRepository extends JpaRepository<ConfessionalDocument, Long> {
 
-    List<ConfessionalDocument> findAllByTitleContainingIgnoreCase(String str);
+    List<ConfessionalDocument> findAllByTitleContainingIgnoreCaseOrderByTitle(String title);
+
+    List<ConfessionalDocument> findAllByTitleContainingIgnoreCaseAndCreatedAtBetweenOrderByTitle
+            (String title, Short createdAt, Short createdAt2);
 
 }

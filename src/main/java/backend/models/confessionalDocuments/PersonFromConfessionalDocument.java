@@ -1,6 +1,7 @@
 package backend.models.confessionalDocuments;
 
 import backend.models.references.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,6 +17,7 @@ public class PersonFromConfessionalDocument {
 
     @ManyToOne
     @JoinColumn(name = "document_id", nullable = false)
+    @JsonIgnore
     private ConfessionalDocument document;
 
     @Column(name = "first_name")

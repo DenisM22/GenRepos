@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Search, Menu, X, FileText, Users, BookOpen } from "lucide-react"
+import { Search, Menu, X, FileText, Users, BookOpen, LogIn, UserPlus } from "lucide-react"
 import { useState } from "react"
 
 export default function Header() {
@@ -52,10 +52,16 @@ export default function Header() {
 
             <div className="hidden md:flex gap-2">
               <Link href="/login">
-                <Button variant="ghost">Войти</Button>
+                <Button variant="ghost" className="flex items-center gap-2">
+                  <LogIn className="h-4 w-4" />
+                  Войти
+                </Button>
               </Link>
               <Link href="/register">
-                <Button>Регистрация</Button>
+                <Button className="flex items-center gap-2">
+                  <UserPlus className="h-4 w-4" />
+                  Регистрация
+                </Button>
               </Link>
             </div>
 
@@ -93,12 +99,18 @@ export default function Header() {
                   <BookOpen className="h-4 w-4" />
                   Родословная
                 </Link>
-                <div className="flex gap-2 mt-2">
+                <div className="flex flex-col gap-2 mt-2">
                   <Link href="/login" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="ghost">Войти</Button>
+                    <Button variant="ghost" className="w-full justify-start">
+                      <LogIn className="h-4 w-4 mr-2" />
+                      Войти
+                    </Button>
                   </Link>
                   <Link href="/register" onClick={() => setIsMenuOpen(false)}>
-                    <Button>Регистрация</Button>
+                    <Button className="w-full justify-start">
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Регистрация
+                    </Button>
                   </Link>
                 </div>
               </nav>

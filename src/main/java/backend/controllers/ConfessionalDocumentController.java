@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/confessional-document")
+@RequestMapping("/document/confessional")
 @RequiredArgsConstructor
 @Slf4j
 public class ConfessionalDocumentController {
@@ -18,21 +18,23 @@ public class ConfessionalDocumentController {
     private final ModelMapper modelMapper;
 
     @GetMapping("/get-all")
-    public ResponseEntity<?> getAllDocuments(@RequestParam(name = "str", required = false) String str) {
-        log.info("Отправлен запрос на получение всех документов");
-        return ResponseEntity.ok(confessionalDocumentService.getDocumentsStartingWith(str));
+    public ResponseEntity<?> getAllDocuments(@RequestParam(name = "str", required = false) String str,
+                                             @RequestParam(name = "from", required = false) Short from,
+                                             @RequestParam(name = "to", required = false) Short to) {
+        log.info("Отправлен запрос на получение всех исповедных ведомостей");
+        return ResponseEntity.ok(confessionalDocumentService.getAllDocuments(str, from, to));
     }
 
     @GetMapping("/get/{id}")
     public ResponseEntity<?> getDocumentById(@PathVariable Long id) {
-        log.info("Отправлен запрос на получение документа с id {}", id);
+        log.info("Отправлен запрос на получение исповедной ведомости с id {}", id);
         return ResponseEntity.ok(confessionalDocumentService.getDocumentById(id));
     }
 
     @PostMapping("/save")
     public ResponseEntity<?> saveDocument(@RequestBody ConfessionalDocument confessionalDocument) {
         try {
-            log.info("Отправлен запрос на сохранение документа");
+            log.info("Отправлен запрос на сохранение исповедной ведомости");
             confessionalDocumentService.saveDocument(confessionalDocument);
             return ResponseEntity.ok().build();
         }

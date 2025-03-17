@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/revision-document")
+@RequestMapping("/document/revision")
 @RequiredArgsConstructor
 @Slf4j
 public class RevisionDocumentController {
@@ -18,21 +18,23 @@ public class RevisionDocumentController {
     private final ModelMapper modelMapper;
 
     @GetMapping("/get-all")
-    public ResponseEntity<?> getAllDocuments(@RequestParam(name = "str", required = false) String str) {
-        log.info("Отправлен запрос на получение всех документов");
-        return ResponseEntity.ok(revisionDocumentService.getDocumentsStartingWith(str));
+    public ResponseEntity<?> getAllDocuments(@RequestParam(name = "str", required = false) String str,
+                                             @RequestParam(name = "from", required = false) Short from,
+                                             @RequestParam(name = "to", required = false) Short to) {
+        log.info("Отправлен запрос на получение всех ревизских сказок");
+        return ResponseEntity.ok(revisionDocumentService.getAllDocuments(str, from, to));
     }
 
     @GetMapping("/get/{id}")
     public ResponseEntity<?> getDocumentById(@PathVariable Long id) {
-        log.info("Отправлен запрос на получение документа с id {}", id);
+        log.info("Отправлен запрос на получение ревизской сказки с id {}", id);
         return ResponseEntity.ok(revisionDocumentService.getDocumentById(id));
     }
 
     @PostMapping("/save")
     public ResponseEntity<?> saveDocument(@RequestBody RevisionDocument revisionDocument) {
         try {
-            log.info("Отправлен запрос на сохранение документа");
+            log.info("Отправлен запрос на сохранение ревизской сказки");
             revisionDocumentService.saveDocument(revisionDocument);
             return ResponseEntity.ok().build();
         }

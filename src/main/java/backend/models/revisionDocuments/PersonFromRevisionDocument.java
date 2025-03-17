@@ -1,6 +1,7 @@
 package backend.models.revisionDocuments;
 
 import backend.models.references.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +18,7 @@ public class PersonFromRevisionDocument {
 
     @ManyToOne
     @JoinColumn(name = "document_id", nullable = false)
+    @JsonIgnore
     private RevisionDocument document;
 
     @Column(name = "first_name")

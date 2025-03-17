@@ -5,7 +5,9 @@ import backend.models.confessionalDocuments.ConfessionalDocument;
 import backend.repositories.ConfessionalDocumentRepository;
 import backend.repositories.FuzzyDateRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +17,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
@@ -34,18 +37,29 @@ public class ConfessionalDocumentService {
             "^(https?|ftp)://[\\w.-]+(?:\\.[\\w.-]+)+[/#?]?.*$", Pattern.CASE_INSENSITIVE
     );
 
-    public List<DocumentLightDto> getDocumentsStartingWith(String str) {
+    public List<DocumentLightDto> getAllDocuments(String str, Short from, Short to) {
         List<ConfessionalDocument> confessionalDocuments;
-        if (str == null || str.isEmpty())
-            confessionalDocuments = confessionalDocumentRepository.findAll();
-        else
-            confessionalDocuments = confessionalDocumentRepository.findAllByTitleContainingIgnoreCase(str);
+        if ((str == null || str.isBlank()) && from == null && to == null)
+            confessionalDocuments = confessionalDocumentRepository.findAll(Sort.by("title"));
+        else if ((str != null && !str.isBlank()) && from == null && to == null)
+            confessionalDocuments = confessionalDocumentRepository.findAllByTitleContainingIgnoreCaseOrderByTitle(str);
+        else {
+            if (from == null)
+                from = 0;
+            if (to == null)
+                to = 3000;
+            confessionalDocuments = confessionalDocumentRepository.findAllByTitleContainingIgnoreCaseAndCreatedAtBetweenOrderByTitle
+                    (str, from, to);
+        }
+
         return confessionalDocuments.stream().map(document ->
                 modelMapper.map(document, DocumentLightDto.class)).toList();
     }
 
     public ConfessionalDocument getDocumentById(Long id) {
-        return confessionalDocumentRepository.findById(id).orElseThrow(() -> new RuntimeException("Документ не найден"));
+        ConfessionalDocument document = confessionalDocumentRepository.findById(id).orElseThrow(() -> new RuntimeException("Документ не найден"));
+        Hibernate.initialize(document.getPeople());
+        return document;
     }
 
     public void saveDocument(ConfessionalDocument confessionalDocument) {

@@ -7,16 +7,19 @@ import { useParams } from "next/navigation"
 import Header from "@/components/header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { FileText, Calendar, MapPin, Church, Baby, Heart, Skull } from "lucide-react"
+import {FileText, Calendar, MapPin, Church, Baby, Heart, Skull, ImageIcon} from "lucide-react"
 import type { MetricDocument, BirthRecord, MarriageRecord, DeathRecord } from "@/app/types/models"
 import {confessionalDocumentApi, metricDocumentApi} from "@/app/api/api";
 import {AxiosError} from "axios";
+import { Button } from "@/components/ui/button"
+import { ImageGallery } from "@/components/image-gallery"
 
 export default function MetricDocumentPage() {
     const params = useParams()
     const [message, setMessage] = useState('')
     const [document, setDocument] = useState<MetricDocument | null>(null)
     const [activeTab, setActiveTab] = useState("birth")
+    const [showGallery, setShowGallery] = useState(false)
 
     const fetchDocument = async () => {
         try {
@@ -65,6 +68,16 @@ export default function MetricDocumentPage() {
                 <strong>Приход:</strong> {document.parish?.parish}
               </span>
                         </div>
+                        {(document.birthRecords?.some((record) => record.image) ||
+                            document.marriageRecords?.some((record) => record.image) ||
+                            document.deathRecords?.some((record) => record.image)) && (
+                            <div className="mt-4 pt-4 border-t">
+                                <Button variant="outline" className="flex items-center gap-2" onClick={() => setShowGallery(true)}>
+                                    <ImageIcon className="h-4 w-4" />
+                                    Открыть галерею изображений
+                                </Button>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
 
@@ -114,6 +127,39 @@ export default function MetricDocumentPage() {
                     </TabsContent>
                 </Tabs>
             </main>
+            <ImageGallery
+                images={[
+                    ...(document.birthRecords
+                        ?.filter((record) => record.image)
+                        .map((record) => ({
+                            id: record.id,
+                            image: record.image || "/placeholder.svg",
+                            title: record.newbornName,
+                            description: record.imageDescription,
+                            icon: <Baby className="h-5 w-5 text-primary" />,
+                        })) || []),
+                    ...(document.marriageRecords
+                        ?.filter((record) => record.image)
+                        .map((record) => ({
+                            id: record.id,
+                            image: record.image || "/placeholder.svg",
+                            title: `${record.groomLastName} и ${record.brideLastName}`,
+                            description: record.imageDescription,
+                            icon: <Heart className="h-5 w-5 text-primary" />,
+                        })) || []),
+                    ...(document.deathRecords
+                        ?.filter((record) => record.image)
+                        .map((record) => ({
+                            id: record.id,
+                            image: record.image || "/placeholder.svg",
+                            title: `${record.lastName} ${record.firstName} ${record.middleName}`,
+                            description: record.imageDescription,
+                            icon: <Skull className="h-5 w-5 text-primary" />,
+                        })) || []),
+                ]}
+                isOpen={showGallery}
+                onClose={() => setShowGallery(false)}
+            />
         </div>
     )
 }
@@ -167,14 +213,18 @@ const BirthRecordCard: React.FC<BirthRecordCardProps> = ({ record, index }) => {
                     </p>
                 )}
                 {record.image && (
-                    <div className="mt-2">
-                        <img
-                            src={record.image || "/placeholder.svg"}
-                            alt={record.imageDescription || "Изображение записи о рождении"}
-                            className="w-full h-auto rounded-md"
-                        />
-                    </div>
-                )}
+                <div className="mt-2">
+                    <a href={record.image} target="_blank" rel="noopener noreferrer">
+                        <div className="relative w-full h-32 overflow-hidden rounded-md">
+                            <img
+                                src={record.image || "/placeholder.svg"}
+                                alt={record.imageDescription || "Изображение записи о рождении"}
+                                className="object-cover w-full h-full hover:opacity-90 transition-opacity"
+                            />
+                        </div>
+                    </a>
+                </div>
+            )}
             </CardContent>
         </Card>
     )
@@ -228,14 +278,18 @@ const MarriageRecordCard: React.FC<MarriageRecordCardProps> = ({record, index}) 
                     </p>
                 )}
                 {record.image && (
-                    <div className="mt-2">
-                        <img
-                            src={record.image || "/placeholder.svg"}
-                            alt={record.imageDescription || "Изображение записи о браке"}
-                            className="w-full h-auto rounded-md"
-                        />
-                    </div>
-                )}
+                <div className="mt-2">
+                    <a href={record.image} target="_blank" rel="noopener noreferrer">
+                        <div className="relative w-full h-32 overflow-hidden rounded-md">
+                            <img
+                                src={record.image || "/placeholder.svg"}
+                                alt={record.imageDescription || "Изображение записи о браке"}
+                                className="object-cover w-full h-full hover:opacity-90 transition-opacity"
+                            />
+                        </div>
+                    </a>
+                </div>
+            )}
             </CardContent>
         </Card>
     )
@@ -286,11 +340,15 @@ const DeathRecordCard: React.FC<DeathRecordCardProps> = ({record, index}) => {
                 )}
                 {record.image && (
                     <div className="mt-2">
-                        <img
-                            src={record.image || "/placeholder.svg"}
-                            alt={record.imageDescription || "Изображение записи о смерти"}
-                            className="w-full h-auto rounded-md"
-                        />
+                        <a href={record.image} target="_blank" rel="noopener noreferrer">
+                            <div className="relative w-full h-32 overflow-hidden rounded-md">
+                                <img
+                                    src={record.image || "/placeholder.svg"}
+                                    alt={record.imageDescription || "Изображение записи о смерти"}
+                                    className="object-cover w-full h-full hover:opacity-90 transition-opacity"
+                                />
+                            </div>
+                        </a>
                     </div>
                 )}
             </CardContent>

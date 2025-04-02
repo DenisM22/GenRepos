@@ -130,9 +130,9 @@ export default function Home() {
             <div className="flex flex-col md:flex-row justify-between items-center">
               <div className="flex items-center gap-2 mb-4 md:mb-0">
                 <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
-                  <span className="text-primary-foreground font-bold text-sm">ГР</span>
+                  <span className="text-primary-foreground font-bold text-sm">GR</span>
                 </div>
-                <span className="font-bold">ГенРепозиторий</span>
+                <span className="font-bold">GenRepos</span>
               </div>
               <div className="flex gap-8">
                 <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
@@ -147,7 +147,7 @@ export default function Home() {
               </div>
             </div>
             <div className="mt-8 text-center text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} ГенРепозиторий. Все права защищены.
+              &copy; {new Date().getFullYear()} GenRepos. Все права защищены.
             </div>
           </div>
         </footer>

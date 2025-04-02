@@ -33,15 +33,9 @@ public class MetricDocumentController {
 
     @PostMapping("/save")
     public ResponseEntity<?> saveDocument(@RequestBody MetricDocument metricDocument) {
-        try {
-            log.info("Отправлен запрос на сохранение метрической книги");
-            metricDocumentService.saveDocument(metricDocument);
-            return ResponseEntity.ok().build();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        log.info("Отправлен запрос на сохранение метрической книги");
+        metricDocumentService.saveDocument(metricDocument);
+        return ResponseEntity.ok().build();
     }
 
 }

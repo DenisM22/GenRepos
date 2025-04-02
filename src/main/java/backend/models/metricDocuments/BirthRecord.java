@@ -95,4 +95,5 @@ public class BirthRecord {
 
     @Column(name = "image_description")
     private String imageDescription;
+
 }

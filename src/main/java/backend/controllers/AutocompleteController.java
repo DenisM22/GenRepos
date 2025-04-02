@@ -61,4 +61,5 @@ public class AutocompleteController {
     public ResponseEntity<?> getLandowners(@RequestParam(name = "str") String str) {
         return ResponseEntity.ok(autocompleteService.getLandowners(str));
     }
+
 }

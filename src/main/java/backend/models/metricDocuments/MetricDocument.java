@@ -31,9 +31,9 @@ public class MetricDocument {
     private List<BirthRecord> birthRecords;
 
     @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DeathRecord> deathRecords;
+    private List<MarriageRecord> marriageRecords;
 
     @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MarriageRecord> marriageRecords;
+    private List<DeathRecord> deathRecords;
 
 }

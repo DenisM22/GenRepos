@@ -1,6 +1,6 @@
 "use client"
 
-import {useState} from "react"
+import {useEffect, useState} from "react"
 import Link from "next/link"
 import {Button} from "@/components/ui/button"
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
@@ -34,6 +34,10 @@ export default function PeoplePage() {
     const [selectedUyezd, setSelectedUyezd] = useState<number>()
     const [startBirthYear, setStartBirthYear] = useState<number>()
     const [endBirthYear, setEndBirthYear] = useState<number>()
+
+    useEffect(() => {
+        fetchPeople()
+    }, [selectedUyezd, startBirthYear, endBirthYear]);
 
     const fetchPeople = async () => {
         try {
@@ -113,28 +117,28 @@ export default function PeoplePage() {
                                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                             <Calendar className="h-4 w-4 flex-shrink-0"/>
                                             <span>
-                            Дата рождения:{" "}
+                                                Дата рождения:{" "}
                                                 {person.birthDate ? (
                                                     person.birthDate.description === "Диапазон" ? (
                                                         `между ${person.birthDate.startDate} и ${person.birthDate.endDate}`
                                                     ) : person.birthDate.description === "Точная дата" ? (
                                                         person.birthDate.exactDate
                                                     ) : (
-                                                        person.birthDate.description.toLowerCase() + " " + person.birthDate.exactDate
+                                                        person?.birthDate?.description.toLowerCase() + " " + person.birthDate.exactDate
                                                     )
                                                 ) : (
-                                                    "Не указана"
+                                                    "не указана"
                                                 )}
-                          </span>
+                                            </span>
                                         </div>
                                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                             <MapPin className="h-4 w-4 flex-shrink-0"/>
                                             <span>
-                            Место рождения:{" "}
+                                                Место рождения:{" "}
                                                 {person.place ? (
                                                     `${person.place?.volost?.uyezd?.uyezd} уезд, ${person.place?.volost?.volost}, ${person.place?.place}`
                                                 ) : ("не указано")}
-                          </span>
+                                            </span>
                                         </div>
                                     </div>
                                 </CardContent>

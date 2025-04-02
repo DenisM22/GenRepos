@@ -6,12 +6,12 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "people")
 @Getter
 @Setter
-@ToString
 public class Person {
 
     @Id
@@ -47,10 +47,6 @@ public class Person {
     @JoinColumn(name = "social_status_id")
     private SocialStatus socialStatus;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "spouse_id")
-    private Person spouse;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "father_id")
     private Person father;
@@ -59,7 +55,11 @@ public class Person {
     @JoinColumn(name = "mother_id")
     private Person mother;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "spouse_id")
+    private Person spouse;
+
+    @ManyToMany
     @JoinTable(
             name = "parents_children",
             joinColumns = @JoinColumn(name = "parent_id"),
@@ -72,6 +72,54 @@ public class Person {
             children = new ArrayList<>();
         }
         children.add(child);
+    }
+
+    public void removeChild(Person child) {
+        if (children != null) {
+            children.remove(child);
+        } else
+            throw new IllegalArgumentException("Список детей пуст");
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Person person = (Person) o;
+
+        return Objects.equals(id, person.id) &&
+                Objects.equals(firstName, person.firstName) &&
+                Objects.equals(lastName, person.lastName) &&
+                Objects.equals(middleName, person.middleName) &&
+                Objects.equals(gender, person.gender) &&
+                Objects.equals(birthDate, person.birthDate) &&
+                Objects.equals(deathDate, person.deathDate) &&
+                Objects.equals(place, person.place) &&
+                Objects.equals(socialStatus, person.socialStatus) &&
+                Objects.equals(father != null ? father.getId() : null, person.father != null ? person.father.getId() : null) &&
+                Objects.equals(mother != null ? mother.getId() : null, person.mother != null ? person.mother.getId() : null) &&
+                Objects.equals(spouse != null ? spouse.getId() : null, person.spouse != null ? person.spouse.getId() : null) &&
+                Objects.equals(
+                        children.stream().map(Person::getId).toList(),
+                        person.children.stream().map(Person::getId).toList()
+                );
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, firstName, lastName, middleName, gender, birthDate, deathDate, place, socialStatus,
+                father != null ? father.getId() : null,
+                mother != null ? mother.getId() : null,
+                spouse != null ? spouse.getId() : null,
+                children.stream().map(Person::getId).toList());
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'';
     }
 
 }

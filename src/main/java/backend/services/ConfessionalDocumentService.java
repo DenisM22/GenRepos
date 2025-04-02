@@ -4,6 +4,8 @@ import backend.dto.DocumentLightDto;
 import backend.models.confessionalDocuments.ConfessionalDocument;
 import backend.repositories.ConfessionalDocumentRepository;
 import backend.repositories.FuzzyDateRepository;
+import backend.repositories.LandownerRepository;
+import backend.repositories.ParishRepository;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
@@ -11,16 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.util.Base64;
 import java.util.List;
-import java.util.UUID;
 import java.util.regex.Pattern;
 
 @Service
@@ -28,14 +21,16 @@ import java.util.regex.Pattern;
 @Transactional
 public class ConfessionalDocumentService {
 
+    private static final Pattern URL_PATTERN = Pattern.compile(
+            "^(https?|ftp)://[\\w.-]+(?:\\.[\\w.-]+)+[/#?]?.*$", Pattern.CASE_INSENSITIVE
+    );
     private final ConfessionalDocumentRepository confessionalDocumentRepository;
     private final FuzzyDateRepository fuzzyDateRepository;
     private final ModelMapper modelMapper;
     private final int SIZE = 1;
     private final String IMAGE_PATH = "C:\\Program Files\\PostgreSQL\\17\\data\\images\\ConfessionalDocuments";
-    private static final Pattern URL_PATTERN = Pattern.compile(
-            "^(https?|ftp)://[\\w.-]+(?:\\.[\\w.-]+)+[/#?]?.*$", Pattern.CASE_INSENSITIVE
-    );
+    private final ParishRepository parishRepository;
+    private final LandownerRepository landownerRepository;
 
     public List<DocumentLightDto> getAllDocuments(String str, Short from, Short to) {
         List<ConfessionalDocument> confessionalDocuments;
@@ -57,43 +52,41 @@ public class ConfessionalDocumentService {
     }
 
     public ConfessionalDocument getDocumentById(Long id) {
-        ConfessionalDocument document = confessionalDocumentRepository.findById(id).orElseThrow(() -> new RuntimeException("Документ не найден"));
+        ConfessionalDocument document = confessionalDocumentRepository.findById(id).orElseThrow(() ->
+                new RuntimeException("Документ не найден"));
         Hibernate.initialize(document.getPeople());
         return document;
     }
 
     public void saveDocument(ConfessionalDocument confessionalDocument) {
-        //Сохранение людей из документа
+
+        if (confessionalDocument.getParish() != null) {
+            if (confessionalDocument.getParish().getId() == null)
+                throw new RuntimeException("Приход " + confessionalDocument.getParish().getParish() + " не был найден");
+            else
+                parishRepository.findById(confessionalDocument.getParish().getId()).orElseThrow(() ->
+                        new RuntimeException("Приход " + confessionalDocument.getParish().getParish() + " не был найден"));
+        }
+
         if (confessionalDocument.getPeople() != null) {
-            confessionalDocument.getPeople().forEach(personFromDocument -> {
+            confessionalDocument.getPeople().forEach(record -> {
 
-                if (personFromDocument.getBirthDate() != null)
-                    fuzzyDateRepository.save(personFromDocument.getBirthDate());
-                if (personFromDocument.getDeathDate() != null)
-                    fuzzyDateRepository.save(personFromDocument.getDeathDate());
+                if (record.getLandowner() != null) {
+                    if (record.getLandowner().getId() == null)
+                        throw new RuntimeException("Для одной из записей не был найден землевладелец " +
+                                record.getLandowner().getLandowner());
+                    else
+                        landownerRepository.findById(record.getLandowner().getId()).orElseThrow(() ->
+                                new RuntimeException("Для одной из записей не был найден землевладелец " +
+                                        record.getLandowner().getLandowner()));
+                }
 
-                personFromDocument.setDocument(confessionalDocument);
+                if (record.getBirthDate() != null)
+                    fuzzyDateRepository.save(record.getBirthDate());
+                if (record.getDeathDate() != null)
+                    fuzzyDateRepository.save(record.getDeathDate());
 
-//                //Сохранение изображения в директорию и замена поля на путь к файлу, если строка base64
-//                if (personFromDocument.getImage() != null && !personFromDocument.getImage().isEmpty()) {
-//                    if (personFromDocument.getImage().startsWith("data:image")) {
-//                        try {
-//                            String fileName = UUID.randomUUID() + ".png";
-//                            Path filePath = Paths.get(IMAGE_PATH, fileName);
-//
-//                            byte[] bytes = Base64.getDecoder().decode(personFromDocument.getImage());
-//
-//                            Files.createDirectories(filePath.getParent());
-//                            Files.write(filePath, bytes);
-//
-//                            personFromDocument.setImage(null);
-//                            personFromDocument.setImage(filePath.toString());
-//                        } catch (Exception ex) {
-//                            throw new RuntimeException(ex);
-//                        }
-//                    }
-//                }
-
+                record.setDocument(confessionalDocument);
             });
         }
 
@@ -101,3 +94,23 @@ public class ConfessionalDocumentService {
     }
 
 }
+
+//Сохранение изображения в директорию и замена поля на путь к файлу, если строка base64
+//                if (record.getImage() != null && !record.getImage().isEmpty()) {
+//                    if (record.getImage().startsWith("data:image")) {
+//                        try {
+//                            String fileName = UUID.randomUUID() + ".png";
+//                            Path filePath = Paths.get(IMAGE_PATH, fileName);
+//
+//                            byte[] bytes = Base64.getDecoder().decode(record.getImage());
+//
+//                            Files.createDirectories(filePath.getParent());
+//                            Files.write(filePath, bytes);
+//
+//                            record.setImage(null);
+//                            record.setImage(filePath.toString());
+//                        } catch (Exception ex) {
+//                            throw new RuntimeException(ex);
+//                        }
+//                    }
+//                }

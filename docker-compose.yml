@@ -3,7 +3,7 @@ version: '3.8'
 services:
   backend:
     build: .
-    image: back-img
+    image: denism22/genrepos-backend
     container_name: back-con
     ports:
       - "8080:8080"
@@ -16,7 +16,7 @@ services:
 
   frontend:
     build: ./frontend
-    image: front-img
+    image: denism22/genrepos-frontend
     container_name: front-con
     ports:
       - "3000:3000"

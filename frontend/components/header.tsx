@@ -14,9 +14,9 @@ export default function Header() {
           <div className="flex items-center gap-2">
             <Link href="/" className="flex items-center gap-2">
               <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-bold">ГР</span>
+                <span className="text-primary-foreground font-bold">GR</span>
               </div>
-              <span className="hidden font-bold sm:inline-block">ГенРепозиторий</span>
+              <span className="hidden font-bold sm:inline-block">GenRepos</span>
             </Link>
           </div>
 
@@ -36,7 +36,7 @@ export default function Header() {
               Люди
             </Link>
             <Link
-                href="/family-tree"
+                href="/family-tree/1"
                 className="text-sm font-medium transition-colors hover:text-primary flex items-center gap-2"
             >
               <BookOpen className="h-4 w-4" />

@@ -64,4 +64,5 @@ public class DeathRecord {
 
     @Column(name = "image_description")
     private String imageDescription;
+
 }

@@ -1,10 +1,27 @@
 import axios from "axios"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://genrepos-backend.onrender.com"
+// const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
 
 export const api = axios.create({
   baseURL: API_URL,
 })
+
+export const personApi = {
+    getAll: (str?: string, uyezdId?: number, from?: number, to?: number, page = 0) => api.get(`/person/get-all`, { params: { str, page, uyezdId, from, to } }),
+    getById: (id: string | string[]) => api.get(`/person/get/${id}`),
+    save: (person: any) =>
+        api.post("/person/save", person, {
+            headers: { "Content-Type": "application/json" },
+        }),
+    edit: (id: string | string[], person: any) =>
+        api.patch(`/person/edit/${id}`, person, {
+            headers: { "Content-Type": "application/json" },
+        }),
+    delete: (id: string | string[]) => api.delete(`person/delete/${id}`),
+    getFamilyTree: (id: string | string[]) => api.get(`/person/family-tree/${id}`),
+    getGedcom: (id: string | string[]) => api.get(`/person/family-tree/gedcom/${id}`),
+}
 
 export const metricDocumentApi = {
   getAll: (str?: string, from?: number, to?: number, page = 0) => api.get(`/document/metric/get-all`, { params: { str, page, from, to } }),
@@ -31,15 +48,6 @@ export const revisionDocumentApi = {
       api.post("/document/revision/save", document, {
         headers: { "Content-Type": "application/json" },
       }),
-}
-
-export const personApi = {
-  getAll: (str?: string, uyezdId?: number, from?: number, to?: number, page = 0) => api.get(`/person/get-all`, { params: { str, page, uyezdId, from, to } }),
-  getById: (id: string | string[]) => api.get(`/person/get/${id}`),
-  save: (person: any) =>
-    api.post("/person/save", person, {
-      headers: { "Content-Type": "application/json" },
-    }),
 }
 
 export const autocompleteApi = {

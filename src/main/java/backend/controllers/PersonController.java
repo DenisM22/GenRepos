@@ -1,20 +1,21 @@
 package backend.controllers;
 
 import backend.models.Person;
+import backend.services.GedcomService;
 import backend.services.PersonService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/person")
-@RequiredArgsConstructor
-@Slf4j
 public class PersonController {
 
     private final PersonService personService;
+    private final GedcomService gedcomService;
 
     @GetMapping("/get-all")
     public ResponseEntity<?> getAllPeople(@RequestParam(name = "str", required = false) String str,
@@ -27,13 +28,41 @@ public class PersonController {
 
     @GetMapping("/get/{id}")
     public ResponseEntity<?> getPersonById(@PathVariable Long id) {
+        log.info("Отправлен запрос на получение человека с id {}", id);
         return ResponseEntity.ok().body(personService.getPersonDtoById(id));
     }
 
     @PostMapping("/save")
     public ResponseEntity<?> savePerson(@RequestBody Person person) {
+        log.info("Отправлен запрос на сохранение нового человека");
         personService.savePerson(person);
         return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/edit/{id}")
+    public ResponseEntity<?> editPerson(@PathVariable Long id, @RequestBody Person person) {
+        log.info("Отправлен запрос на редактирование человека с id {}", id);
+        personService.editPerson(id, person);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deletePerson(@PathVariable Long id) {
+        log.info("Отправлен запрос на удаление человека с id {}", id);
+        personService.deletePerson(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/family-tree/{id}")
+    public ResponseEntity<?> getFamilyTree(@PathVariable Long id) {
+        log.info("Отправлен запрос на получение генеалогического древа человека с id {}", id);
+        return ResponseEntity.ok().body(personService.getFamilyTree(id));
+    }
+
+    @GetMapping("/family-tree/gedcom/{id}")
+    public ResponseEntity<?> getGedcomFile(@PathVariable Long id) {
+        log.info("Отправлен запрос на получение файла в формате GEDCOM для человека с id {}", id);
+        return ResponseEntity.ok().body(gedcomService.getGedcomFile(id));
     }
 
 }

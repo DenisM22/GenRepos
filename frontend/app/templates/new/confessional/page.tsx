@@ -17,7 +17,6 @@ import {autocompleteApi} from "@/app/api/api"
 
 export default function AddTemplate() {
     const router = useRouter()
-    const [message, setMessage] = useState('')
     const [template, setTemplate] = useState<Omit<Template, "id">>({
         name: "",
         firstName: "",
@@ -94,8 +93,12 @@ export default function AddTemplate() {
         e.preventDefault()
 
         if (!template.name.trim()) {
-            setMessage("Укажите название шаблона")
-            return
+            toast({
+                title: "Ошибка валидации",
+                description: `Укажите название шаблона`,
+                variant: "destructive",
+            })
+            return;
         }
 
         const newTemplate: Template = {
@@ -106,6 +109,7 @@ export default function AddTemplate() {
         toast({
             title: "Шаблон добавлен",
             description: "Новый шаблон успешно создан",
+            variant: "default",
         })
         router.back()
     }
@@ -466,8 +470,8 @@ export default function AddTemplate() {
                                 {renderStatusInput("familyStatus")}
                                 {renderStatusInput("socialStatus")}
                             </form>
-                            {message && <p className="mt-4 text-center text-red-500">{message}</p>}
                         </CardContent>
+
                         <CardFooter>
                             <Button onClick={handleSubmit} className="w-full">
                                 <Save className="mr-2 h-4 w-4"/> Сохранить шаблон

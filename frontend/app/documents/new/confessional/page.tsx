@@ -16,6 +16,7 @@ import {templateConfessionalStore} from "@/app/types/templateStore"
 import {toast} from "@/components/ui/use-toast"
 import {RecordForm} from "@/components/RecordForm"
 import {autocompleteApi, confessionalDocumentApi} from "@/app/api/api";
+import {AxiosError} from "axios";
 
 // Шаги процесса добавления документа
 const steps = [
@@ -26,8 +27,6 @@ const steps = [
 
 export default function AddDocument() {
     const router = useRouter()
-    const [message, setMessage] = useState('')
-
     const [step, setStep] = useState(1)
     const [direction, setDirection] = useState(0)
 
@@ -86,24 +85,31 @@ export default function AddDocument() {
 
     // Переход к следующему шагу
     const nextStep = () => {
-        if (step == 1 && validateDocument(document)) {
-            setMessage(validateDocument(document))
-            setTimeout(() => {
-                setMessage("");
-            }, 3000);
-            return
+        const validationError = validateDocument(document);
+
+        if (step == 1 && validationError) {
+            toast({
+                title: "Ошибка валидации",
+                description: `${validationError}`,
+                variant: "destructive",
+            })
+            return;
         }
+
         if (step == 2 && validateRecords(document?.people)) {
-            setMessage(validateRecords(document.people))
-            setTimeout(() => {
-                setMessage("");
-            }, 3000);
-            return
+            toast({
+                title: "Ошибка валидации",
+                description: `${validateRecords(document?.people)}`,
+                variant: "destructive",
+            })
+            return;
         }
+
         if (step < steps.length) {
             setDirection(1)
             setStep((prev) => prev + 1)
         }
+
     }
 
     // Переход к предыдущему шагу
@@ -139,15 +145,32 @@ export default function AddDocument() {
         e.preventDefault();
         try {
             await confessionalDocumentApi.save(document);
-            router.push("/documents/new")
             console.log("Документ успешно сохранен");
+            toast({
+                title: "Документ добавлен",
+                description: "Новая запись успешно добавлена в хранилище",
+                variant: "success",
+            })
+            router.push("/documents/new")
         } catch (error) {
-            console.error("Ошибка при сохранении документа:", error);
-            setMessage("Ошибка при сохранении документа:" + error)
+            if (error instanceof AxiosError) {
+                console.error("Ошибка при сохранении документа:", error.response);
+                toast({
+                    title: "Ошибка при сохранении документа",
+                    description: `${error?.response?.data}`,
+                    variant: "destructive",
+                })
+            } else {
+                console.error("Неизвестная ошибка:", error);
+                toast({
+                    title: "Неизвестная ошибка",
+                    variant: "destructive",
+                })
+            }
         }
+
     }
 
-    // Обновленный обработчик выбора шаблона
     const handleTemplateSelect = (templateId: string) => {
         const selected = templateConfessionalStore.getTemplateById(templateId)
         if (selected) {
@@ -156,7 +179,6 @@ export default function AddDocument() {
         }
     }
 
-    // Обновленная функция отмены выбора шаблона
     const cancelTemplateSelection = () => {
         setCurrentTemplate(null)
         setSelectedTemplateId(null)
@@ -223,6 +245,7 @@ export default function AddDocument() {
         toast({
             title: "Запись добавлена",
             description: currentTemplate ? "Запись из шаблона успешно добавлена" : "Новая пустая запись успешно добавлена",
+            variant: "default"
         })
     }
 
@@ -258,7 +281,7 @@ export default function AddDocument() {
     }, []);
 
     const renderParishInput = (field: "parish") => {
-        const value = document[field]?.parish || "";  // Доступ к полю parish объекта document
+        const value = document[field]?.parish || "";
 
         return (
             <div className="relative space-y-2">
@@ -525,11 +548,14 @@ export default function AddDocument() {
                                                                         "Не указана"
                                                                     )}
                                                                 </p>
-                                                                <p>Место рождения: {record.place?.place || "Не указано"}</p>
+                                                                <p>Место
+                                                                    рождения: {record.place?.place || "Не указано"}</p>
                                                                 <p>Двор: {record.household || "Не указан"}</p>
                                                                 <p>Землевладелец: {record.landowner?.landowner || "Не указан"}</p>
-                                                                <p>Семейный статус: {record.familyStatus?.familyStatus || "Не указан"}</p>
-                                                                <p>Социальный статус: {record.socialStatus?.socialStatus || "Не указан"}</p>
+                                                                <p>Семейный
+                                                                    статус: {record.familyStatus?.familyStatus || "Не указан"}</p>
+                                                                <p>Социальный
+                                                                    статус: {record.socialStatus?.socialStatus || "Не указан"}</p>
                                                                 {record.image && (
                                                                     <div>
                                                                         <p>
@@ -547,8 +573,8 @@ export default function AddDocument() {
                                                 </div>
                                             </div>
                                         )}
-                                        {message && <p className="mt-4 text-center text-red-500">{message}</p>}
                                     </CardContent>
+
                                     <CardFooter className="flex justify-between pt-2">
                                         {step > 1 && (
                                             <Button
@@ -590,6 +616,7 @@ export default function AddDocument() {
                                             </Button>
                                         )}
                                     </CardFooter>
+
                                 </Card>
                             </motion.div>
                         </AnimatePresence>

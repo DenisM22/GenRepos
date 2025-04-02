@@ -1,15 +1,13 @@
 package backend.models.references;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "fuzzy_dates")
-@Getter
-@Setter
+@Data
 public class FuzzyDate {
 
     @Id

@@ -1,26 +1,7 @@
 --
 -- Справочники
 --
-/*
-\COPY first_names(first_name) FROM 'C:/Users/denis/Downloads/first_names.csv' DELIMITER ',' CSV ENCODING 'UTF8';
-\COPY last_names(last_name) FROM 'C:/Users/denis/Downloads/last_names.csv' DELIMITER ',' CSV ENCODING 'UTF8';
-\COPY middle_names(middle_name) FROM 'C:/Users/denis/Downloads/middle_names.csv' DELIMITER ',' CSV ENCODING 'UTF8';
-\COPY volosts(volost) FROM 'C:/Users/denis/Downloads/volosts.csv' DELIMITER ',' CSV ENCODING 'UTF8';
-\COPY places(place) FROM 'C:/Users/denis/Downloads/places.csv' DELIMITER ',' CSV ENCODING 'UTF8';
-\COPY parishes(parish) FROM 'C:/Users/denis/Downloads/parishes.csv' DELIMITER ',' CSV ENCODING 'UTF8';
- INSERT INTO uyezdy (uyezd) VALUES
-                               ('Вельский'),
-                               ('Вологодский'),
-                               ('Грязовецкий'),
-                               ('Кадниковский'),
-                               ('Никольский'),
-                               ('Сольвычегодский'),
-                               ('Тотемский'),
-                               ('Усть-Сысольский'),
-                               ('Устюжский'),
-                               ('Яренский');
- */
---Порядок: имена, возраст, даты, место, принадлежность и статусы
+--\COPY first_names(first_name) FROM 'C:/Users/denis/Downloads/first_names.csv' DELIMITER ',' CSV ENCODING 'UTF8';
 
 CREATE TABLE IF NOT EXISTS first_names (
     first_name VARCHAR(255) PRIMARY KEY
@@ -105,9 +86,9 @@ CREATE TABLE IF NOT EXISTS people (
     death_date BIGINT REFERENCES fuzzy_dates(id),
     place_id BIGINT REFERENCES places(id),
     social_status_id BIGINT REFERENCES places(id),
-    spouse_id BIGINT REFERENCES people(id),
-    father_id BIGINT REFERENCES people(id),
-    mother_id BIGINT REFERENCES people(id)
+    father_id BIGINT REFERENCES people(id) ON DELETE SET NULL,
+    mother_id BIGINT REFERENCES people(id) ON DELETE SET NULL,
+    spouse_id BIGINT REFERENCES people(id) ON DELETE SET NULL
     );
 
 CREATE TABLE IF NOT EXISTS parents_children (

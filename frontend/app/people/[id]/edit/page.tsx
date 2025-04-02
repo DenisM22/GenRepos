@@ -2,7 +2,7 @@
 
 import React, {useCallback, useEffect, useState} from "react"
 import {motion} from "framer-motion"
-import {Calendar, MapPin, Plus, Save, User, Users, X} from "lucide-react"
+import {Calendar, Edit, MapPin, Plus, User, Users, X} from "lucide-react"
 import Header from "@/components/header"
 import {Button} from "@/components/ui/button"
 import {Input} from "@/components/ui/input"
@@ -14,8 +14,11 @@ import {FuzzyDate, Person, Place, SocialStatus, Uyezd, Volost} from "@/app/types
 import {autocompleteApi, personApi} from "@/app/api/api";
 import {toast} from "@/components/ui/use-toast"
 import {AxiosError} from "axios";
+import {useParams, useRouter} from "next/navigation";
 
-export default function AddPerson() {
+export default function EditPerson() {
+    const router = useRouter()
+    const params = useParams()
     const [person, setPerson] = useState<Person>({
         gender: "MALE",
     })
@@ -29,10 +32,24 @@ export default function AddPerson() {
     });
     const [activeField, setActiveField] = useState<{ field: keyof Person; index?: number } | null>(null);
 
+    const fetchPerson = async () => {
+        try {
+            const response = await personApi.getById(params.id)
+            setPerson(response.data)
+        } catch (error: unknown) {
+            if (error instanceof AxiosError) {
+                console.error(error.response?.data);
+            } else {
+                console.error(error);
+            }
+        }
+    };
+
     useEffect(() => {
         fetchUyezdy()
         fetchSocialStatuses()
-    }, [])
+        fetchPerson()
+    }, [params.id])
 
     const fetchUyezdy = async () => {
         try {
@@ -120,7 +137,7 @@ export default function AddPerson() {
         }
 
         try {
-            await personApi.save(person);
+            await personApi.edit(params.id, person);
             setPerson({
                 id: undefined,
                 firstName: "",
@@ -139,18 +156,19 @@ export default function AddPerson() {
                 children: [],
             });
 
-            console.log("Человек успешно сохранен");
+            console.log("Человек успешно обновлен");
             toast({
-                title: "Человек добавлен",
-                description: "Новая запись успешно добавлена в хранилище",
+                title: "Человек обновлен",
+                description: "Запись успешно обновлена",
                 variant: "success",
             })
 
+            router.push(`/people/${params.id}`)
         } catch (error) {
             if (error instanceof AxiosError) {
-                console.error("Ошибка при сохранении человека:", error.response);
+                console.error("Ошибка при обновлении человека:", error.response);
                 toast({
-                    title: "Ошибка при сохранении человека",
+                    title: "Ошибка при обновлении человека",
                     description: `${error?.response?.data}`,
                     variant: "destructive",
                 })
@@ -331,10 +349,24 @@ export default function AddPerson() {
         )
     }
     const handleDateChange = (field: "birthDate" | "deathDate", key: keyof FuzzyDate, value: string) => {
-        setPerson((prev) => ({
-            ...prev,
-            [field]: {...prev[field], [key]: value},
-        }))
+        if (key == "exactDate" || key == "description") {
+            setPerson((prev) => ({
+                ...prev,
+                [field]: {...prev[field],
+                    [key]: value,
+                    "startDate": null,
+                    "endDate": null},
+            }))
+        }
+        else {
+            setPerson((prev) => ({
+                ...prev,
+                [field]: {...prev[field],
+                    [key]: value,
+                    "exactDate": null},
+            }))
+        }
+
     }
 
     const renderLocationSelectors = () => {
@@ -714,8 +746,8 @@ export default function AddPerson() {
 
                         <CardFooter className="flex justify-end">
                             <Button onClick={handleSubmit} className="gap-2 text-base">
-                                <Save className="h-5 w-5"/>
-                                Сохранить
+                                <Edit className="h-5 w-5"/>
+                                Обновить
                             </Button>
                         </CardFooter>
 

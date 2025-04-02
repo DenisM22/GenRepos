@@ -33,15 +33,9 @@ public class RevisionDocumentController {
 
     @PostMapping("/save")
     public ResponseEntity<?> saveDocument(@RequestBody RevisionDocument revisionDocument) {
-        try {
-            log.info("Отправлен запрос на сохранение ревизской сказки");
-            revisionDocumentService.saveDocument(revisionDocument);
-            return ResponseEntity.ok().build();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        log.info("Отправлен запрос на сохранение ревизской сказки");
+        revisionDocumentService.saveDocument(revisionDocument);
+        return ResponseEntity.ok().build();
     }
 
 }

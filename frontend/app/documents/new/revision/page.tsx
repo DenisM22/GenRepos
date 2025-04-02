@@ -24,6 +24,7 @@ import {templateRevisionStore} from "@/app/types/templateStore"
 import {toast} from "@/components/ui/use-toast"
 import {autocompleteApi, revisionDocumentApi} from "@/app/api/api";
 import {RevisionRecordForm} from "@/components/RevisionRecordForm";
+import {AxiosError} from "axios";
 
 // Шаги процесса добавления документа
 const steps = [
@@ -34,8 +35,6 @@ const steps = [
 
 export default function AddDocument() {
     const router = useRouter()
-    const [message, setMessage] = useState('')
-
     const [step, setStep] = useState(1)
     const [direction, setDirection] = useState(0)
 
@@ -74,6 +73,7 @@ export default function AddDocument() {
             console.error("Ошибка загрузки мест:", error);
         }
     };
+
     useEffect(() => {
         setTemplates(templateRevisionStore.getTemplates())
         fetchUyezdy()
@@ -121,24 +121,31 @@ export default function AddDocument() {
 
     // Переход к следующему шагу
     const nextStep = () => {
-        if (step == 1 && validateDocument(document)) {
-            setMessage(validateDocument(document))
-            setTimeout(() => {
-                setMessage("");
-            }, 3000);
-            return
+        const validationError = validateDocument(document);
+
+        if (step == 1 && validationError) {
+            toast({
+                title: "Ошибка валидации",
+                description: `${validationError}`,
+                variant: "destructive",
+            })
+            return;
         }
+
         if (step == 2 && validateRecords(document?.people)) {
-            setMessage(validateRecords(document.people))
-            setTimeout(() => {
-                setMessage("");
-            }, 3000);
-            return
+            toast({
+                title: "Ошибка валидации",
+                description: `${validateRecords(document?.people)}`,
+                variant: "destructive",
+            })
+            return;
         }
+
         if (step < steps.length) {
             setDirection(1)
             setStep((prev) => prev + 1)
         }
+
     }
 
     // Переход к предыдущему шагу
@@ -175,11 +182,29 @@ export default function AddDocument() {
         try {
             await revisionDocumentApi.save(document);
             console.log("Документ успешно сохранен");
+            toast({
+                title: "Документ добавлен",
+                description: "Новая запись успешно добавлена в хранилище",
+                variant: "success",
+            })
             router.push("/documents/new")
         } catch (error) {
-            console.error("Ошибка при сохранении документа:", error);
-            setMessage("Ошибка при сохранении документа:" + error)
+            if (error instanceof AxiosError) {
+                console.error("Ошибка при сохранении документа:", error.response);
+                toast({
+                    title: "Ошибка при сохранении документа",
+                    description: `${error?.response?.data}`,
+                    variant: "destructive",
+                })
+            } else {
+                console.error("Неизвестная ошибка:", error);
+                toast({
+                    title: "Неизвестная ошибка",
+                    variant: "destructive",
+                })
+            }
         }
+
     }
 
     // Обновленный обработчик выбора шаблона
@@ -254,6 +279,7 @@ export default function AddDocument() {
         toast({
             title: "Запись добавлена",
             description: currentTemplate ? "Запись из шаблона успешно добавлена" : "Новая пустая запись успешно добавлена",
+            variant: "default"
         })
     }
 
@@ -630,8 +656,8 @@ export default function AddDocument() {
                                                 </div>
                                             </div>
                                         )}
-                                        {message && <p className="mt-4 text-center text-red-500">{message}</p>}
                                     </CardContent>
+
                                     <CardFooter className="flex justify-between pt-2">
                                         {step > 1 && (
                                             <Button
@@ -673,6 +699,7 @@ export default function AddDocument() {
                                             </Button>
                                         )}
                                     </CardFooter>
+
                                 </Card>
                             </motion.div>
                         </AnimatePresence>

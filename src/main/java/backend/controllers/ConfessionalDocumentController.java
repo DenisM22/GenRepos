@@ -33,15 +33,9 @@ public class ConfessionalDocumentController {
 
     @PostMapping("/save")
     public ResponseEntity<?> saveDocument(@RequestBody ConfessionalDocument confessionalDocument) {
-        try {
-            log.info("Отправлен запрос на сохранение исповедной ведомости");
-            confessionalDocumentService.saveDocument(confessionalDocument);
-            return ResponseEntity.ok().build();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        log.info("Отправлен запрос на сохранение исповедной ведомости");
+        confessionalDocumentService.saveDocument(confessionalDocument);
+        return ResponseEntity.ok().build();
     }
 
 }

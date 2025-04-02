@@ -27,6 +27,8 @@ import {BirthRecordForm} from "@/components/BirthRecordForm"
 import {MarriageRecordForm} from "@/components/MarriageRecordForm"
 import {autocompleteApi, metricDocumentApi} from "@/app/api/api";
 import {DeathRecordForm} from "@/components/DeathRecordForm";
+import {toast} from "@/components/ui/use-toast";
+import {AxiosError} from "axios";
 
 // Шаги процесса добавления документа
 const steps = [
@@ -39,8 +41,6 @@ const steps = [
 
 export default function AddDocument() {
     const router = useRouter()
-    const [message, setMessage] = useState('')
-
     const [step, setStep] = useState(1)
     const [direction, setDirection] = useState(0)
 
@@ -75,6 +75,11 @@ export default function AddDocument() {
             ...prev,
             birthRecords: [...prev.birthRecords, newRecord],
         }));
+        toast({
+            title: "Запись добавлена",
+            description: "Новая запись рождения успешно добавлена",
+            variant: "default"
+        })
     };
     const addMarriageRecord = () => {
         const newRecord: MarriageRecord = {
@@ -84,6 +89,11 @@ export default function AddDocument() {
             ...prev,
             marriageRecords: [...prev.marriageRecords, newRecord],
         }));
+        toast({
+            title: "Запись добавлена",
+            description: "Новая запись брака успешно добавлена",
+            variant: "default"
+        })
     };
     const addDeathRecord = () => {
         const newRecord: DeathRecord = {
@@ -93,6 +103,11 @@ export default function AddDocument() {
             ...prev,
             deathRecords: [...prev.deathRecords, newRecord],
         }));
+        toast({
+            title: "Запись добавлена",
+            description: "Новая запись смерти успешно добавлена",
+            variant: "default"
+        })
     };
 
     //Изменение записей
@@ -164,36 +179,41 @@ export default function AddDocument() {
 
     // Переход к следующему шагу
     const nextStep = () => {
+
         if (step == 1 && validateDocument()) {
-            setMessage(validateDocument())
-            setTimeout(() => {
-                setMessage("");
-            }, 3000);
-            return
+            toast({
+                title: "Ошибка валидации",
+                description: `${validateDocument()}`,
+                variant: "destructive",
+            })
+            return;
         }
 
         if (step == 2 && (validateBirthRecords())) {
-            setMessage(validateBirthRecords())
-            setTimeout(() => {
-                setMessage("");
-            }, 3000);
-            return
+            toast({
+                title: "Ошибка валидации",
+                description: `${validateBirthRecords()}`,
+                variant: "destructive",
+            })
+            return;
         }
 
         if (step == 3 && validateMarriageRecords()) {
-            setMessage(validateMarriageRecords)
-            setTimeout(() => {
-                setMessage("");
-            }, 3000);
-            return
+            toast({
+                title: "Ошибка валидации",
+                description: `${validateMarriageRecords()}`,
+                variant: "destructive",
+            })
+            return;
         }
 
         if (step == 4 && validateDeathRecords()) {
-            setMessage(validateDeathRecords)
-            setTimeout(() => {
-                setMessage("");
-            }, 3000);
-            return
+            toast({
+                title: "Ошибка валидации",
+                description: `${validateDeathRecords()}`,
+                variant: "destructive",
+            })
+            return;
         }
 
         if (step < steps.length) {
@@ -218,7 +238,7 @@ export default function AddDocument() {
         return null;
     };
     const validateBirthRecords = (): string | null => {
-        for (const record of document.birthRecords) {
+        for (const record of document?.birthRecords) {
             if (!record.newbornName?.trim()) {
                 return "Укажите имя новорожденного для каждой записи"
             }
@@ -226,7 +246,7 @@ export default function AddDocument() {
         return null;
     };
     const validateMarriageRecords = (): string | null => {
-        for (const record of document.marriageRecords) {
+        for (const record of document?.marriageRecords) {
             if (!record.groomFirstName?.trim() || !record.groomLastName?.trim()) {
                 return "Укажите имя и фамилию жениха для каждой записи"
             }
@@ -237,7 +257,7 @@ export default function AddDocument() {
         return null;
     };
     const validateDeathRecords = (): string | null => {
-        for (const record of document.deathRecords) {
+        for (const record of document?.deathRecords) {
             if (!record.firstName?.trim() || !record.lastName?.trim()) {
                 return "Укажите имя и фамилию для каждой записи"
             }
@@ -245,17 +265,34 @@ export default function AddDocument() {
         return null;
     };
 
-    //Отправка формы
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await metricDocumentApi.save(document)
-            console.log("Документ успешно сохранен")
+            await metricDocumentApi.save(document);
+            console.log("Документ успешно сохранен");
+            toast({
+                title: "Документ добавлен",
+                description: "Новая запись успешно добавлена в хранилище",
+                variant: "success",
+            })
             router.push("/documents/new")
         } catch (error) {
-            console.error("Ошибка при сохранении документа:", error);
-            setMessage("Ошибка при сохранении документа:" + error)
+            if (error instanceof AxiosError) {
+                console.error("Ошибка при сохранении документа:", error.response);
+                toast({
+                    title: "Ошибка при сохранении документа",
+                    description: `${error?.response?.data}`,
+                    variant: "destructive",
+                })
+            } else {
+                console.error("Неизвестная ошибка:", error);
+                toast({
+                    title: "Неизвестная ошибка",
+                    variant: "destructive",
+                })
+            }
         }
+
     }
 
     const handleParishChange = useCallback(async (field: keyof MetricDocument, value: string) => {
@@ -571,7 +608,7 @@ export default function AddDocument() {
                                                             {document.marriageRecords.map((record, index) => (
                                                                 <div key={record.idDate}
                                                                      className="mb-4 p-4 border rounded-lg">
-                                                                <h4 className="font-medium">
+                                                                    <h4 className="font-medium">
                                                                         {index + 1}.
                                                                         Брак: {record.groomLastName} {record.groomFirstName} и{" "}
                                                                         {record.brideLastName} {record.brideFirstName}
@@ -595,7 +632,7 @@ export default function AddDocument() {
 
                                                     <div>
                                                         <h3 className="text-lg font-semibold mb-2">
-                                                        Записи о смерти ({document.deathRecords.length})
+                                                            Записи о смерти ({document.deathRecords.length})
                                                         </h3>
                                                         <ScrollArea className="h-[20vh] pr-4">
                                                             {document.deathRecords.map((record, index) => (
@@ -626,8 +663,8 @@ export default function AddDocument() {
                                                 </div>
                                             </div>
                                         )}
-                                        {message && <p className="mt-4 text-center text-red-500">{message}</p>}
                                     </CardContent>
+
                                     <CardFooter className="flex justify-between pt-2">
                                         {step > 1 && (
                                             <Button
@@ -669,6 +706,7 @@ export default function AddDocument() {
                                             </Button>
                                         )}
                                     </CardFooter>
+
                                 </Card>
                             </motion.div>
                         </AnimatePresence>

@@ -11,11 +11,14 @@ import type { ConfessionalDocument, PersonFromConfessionalDocument } from "@/app
 import Image from "next/image"
 import {confessionalDocumentApi} from "@/app/api/api";
 import {AxiosError} from "axios";
+import { Button } from "@/components/ui/button"
+import { ImageGallery } from "@/components/image-gallery"
 
 export default function DocumentPage() {
   const params = useParams()
   const [message, setMessage] = useState('')
   const [document, setDocument] = useState<ConfessionalDocument | null>(null)
+  const [showGallery, setShowGallery] = useState(false)
 
   const fetchDocument = async () => {
     try {
@@ -64,6 +67,14 @@ export default function DocumentPage() {
                 <strong>Приход:</strong> {document.parish?.parish}
               </span>
               </div>
+              {document.people?.some((person) => person.image) && (
+                  <div className="mt-4 pt-4 border-t">
+                    <Button variant="outline" className="flex items-center gap-2" onClick={() => setShowGallery(true)}>
+                      <ImageIcon className="h-4 w-4" />
+                      Открыть галерею изображений
+                    </Button>
+                  </div>
+              )}
             </CardContent>
           </Card>
 
@@ -76,6 +87,23 @@ export default function DocumentPage() {
             ))}
           </div>
         </main>
+        {showGallery && (
+            <ImageGallery
+                images={
+                    document.people
+                        ?.filter((person) => person.image)
+                        .map((person) => ({
+                          id: person.id,
+                          image: person.image || "/placeholder.svg",
+                          title: `${person.lastName} ${person.firstName} ${person.middleName}`,
+                          description: person.imageDescription,
+                          icon: <User className="h-5 w-5 text-primary" />,
+                        })) || []
+                }
+                isOpen={showGallery}
+                onClose={() => setShowGallery(false)}
+            />
+        )}
       </div>
   )
 }
@@ -145,13 +173,16 @@ const PersonCard: React.FC<{ person: PersonFromConfessionalDocument; index: numb
                   <ImageIcon className="h-3.5 w-3.5 text-primary" />
                   <strong>Изображение</strong>
                 </p>
-                <Image
-                    src={person.image || "/placeholder.svg"}
-                    alt={person.imageDescription || "Изображение"}
-                    width={100}
-                    height={100}
-                    className="rounded-md"
-                />
+                <a href={person.image} target="_blank" rel="noopener noreferrer">
+                  <div className="relative w-full h-32 overflow-hidden rounded-md">
+                    <Image
+                        src={person.image || "/placeholder.svg"}
+                        alt={person.imageDescription || "Изображение"}
+                        fill
+                        className="object-cover hover:opacity-90 transition-opacity"
+                    />
+                  </div>
+                </a>
               </div>
           )}
         </CardContent>

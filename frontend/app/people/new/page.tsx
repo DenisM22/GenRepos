@@ -1,6 +1,6 @@
 "use client"
 
-import React, {useCallback, useEffect, useState} from "react"
+import React, {Suspense, useCallback, useEffect, useState} from "react"
 import {motion} from "framer-motion"
 import {Calendar, MapPin, Plus, Save, User, Users, X} from "lucide-react"
 import Header from "@/components/header"
@@ -14,8 +14,21 @@ import {FuzzyDate, Person, Place, SocialStatus, Uyezd, Volost} from "@/app/types
 import {autocompleteApi, personApi} from "@/app/api/api";
 import {toast} from "@/components/ui/use-toast"
 import {AxiosError} from "axios";
+import useUserData from "@/components/useUserData";
+import {useRouter, useSearchParams} from "next/navigation";
 
-export default function AddPerson() {
+export default function Page() {
+    return (
+        <Suspense fallback={<div>Загрузка...</div>}>
+            <AddPerson />
+        </Suspense>
+    );
+}
+
+function AddPerson() {
+    const user = useUserData()
+    const me = useSearchParams().get('me');
+    const router = useRouter()
     const [person, setPerson] = useState<Person>({
         gender: "MALE",
     })
@@ -120,7 +133,14 @@ export default function AddPerson() {
         }
 
         try {
-            await personApi.save(person);
+
+            const newPerson = {
+                ...person,
+                userId: user?.id
+            }
+
+            await personApi.save(newPerson, me);
+
             setPerson({
                 id: undefined,
                 firstName: "",
@@ -137,7 +157,8 @@ export default function AddPerson() {
                 father: undefined,
                 mother: undefined,
                 children: [],
-            });
+                userId: user?.id
+            })
 
             console.log("Человек успешно сохранен");
             toast({
@@ -145,6 +166,11 @@ export default function AddPerson() {
                 description: "Новая запись успешно добавлена в хранилище",
                 variant: "success",
             })
+
+            if (me) {
+                sessionStorage.removeItem('user')
+                router.push('/profile')
+            }
 
         } catch (error) {
             if (error instanceof AxiosError) {
@@ -178,7 +204,7 @@ export default function AddPerson() {
                     : typeof prev[field] === "object" && prev[field] !== null
                         ? {...(prev[field] as Person), firstName: value}
                         : value,
-        }));
+        }))
 
         if (value.length > 1) {
             try {
@@ -194,8 +220,14 @@ export default function AddPerson() {
                         response = await autocompleteApi.getMiddleNames(value);
                         break;
                     case "spouse":
+                        response = await personApi.getAll(value);
+                        break;
                     case "father":
+                        response = await personApi.getAll(value, "MALE");
+                        break;
                     case "mother":
+                        response = await personApi.getAll(value, "FEMALE");
+                        break;
                     case "children":
                         response = await personApi.getAll(value);
                         break;

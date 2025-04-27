@@ -23,7 +23,7 @@ public class RevisionDocument {
     @Column(name = "created_at")
     private Short createdAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "place_id")
     private Place place;
 

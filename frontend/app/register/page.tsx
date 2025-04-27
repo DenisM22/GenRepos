@@ -1,23 +1,25 @@
 "use client"
-import { useRouter } from "next/navigation"
+import {useRouter} from "next/navigation"
 import Link from "next/link"
-import { motion } from "framer-motion"
-import { UserPlus, Mail, Lock, User } from "lucide-react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import {motion} from "framer-motion"
+import {Lock, Mail, User, UserPlus} from "lucide-react"
+import {useForm} from "react-hook-form"
+import {zodResolver} from "@hookform/resolvers/zod"
 import * as z from "zod"
 import Header from "@/components/header"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { toast } from "@/components/ui/use-toast"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import {Button} from "@/components/ui/button"
+import {Input} from "@/components/ui/input"
+import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card"
+import {toast} from "@/components/ui/use-toast"
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form"
+import {userApi} from "@/app/api/api";
+import {AxiosError} from "axios";
 
 const registerSchema = z
     .object({
         name: z.string().min(2, "Имя должно содержать минимум 2 символа"),
         email: z.string().email("Введите корректный email адрес"),
-        password: z.string().min(8, "Пароль должен содержать минимум 8 символов"),
+        password: z.string().min(6, "Пароль должен содержать минимум 6 символов"),
         confirmPassword: z.string(),
     })
     .refine((data) => data.password === data.confirmPassword, {
@@ -40,29 +42,55 @@ export default function RegisterPage() {
     })
 
     const onSubmit = async (values: RegisterFormValues) => {
-        // Здесь будет логика регистрации
-        console.log("Registration attempt:", values)
-        toast({
-            title: "Регистрация выполнена",
-            description: "Вы успешно зарегистрировались",
-        })
-        router.push("/login") // Перенаправление на страницу входа после регистрации
+        try {
+            const userToSend = {
+                username: values.name,
+                email: values.email,
+                password: values.password
+            }
+
+            await userApi.register(userToSend);
+
+            toast({
+                title: "Регистрация выполнена",
+                description: "Вы успешно зарегистрировались в системе",
+                variant: "success"
+            })
+
+            router.push("/login")
+
+        } catch (error: unknown) {
+            if (error instanceof AxiosError) {
+                console.error(error.response?.data);
+                toast({
+                    title: "Ошибка при регистрации",
+                    description: `${error?.response?.data}`,
+                    variant: "destructive"
+                })
+            } else {
+                console.error("Неизвестная ошибка:", error);
+                toast({
+                    title: "Неизвестная ошибка",
+                    variant: "destructive",
+                })
+            }
+        }
     }
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-            <Header />
+            <Header/>
             <main className="container mx-auto px-4 py-12">
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
+                    initial={{opacity: 0, y: 20}}
+                    animate={{opacity: 1, y: 0}}
+                    transition={{duration: 0.5}}
                     className="max-w-md mx-auto"
                 >
                     <Card>
                         <CardHeader>
                             <CardTitle className="text-2xl flex items-center gap-2">
-                                <UserPlus className="h-6 w-6 text-primary" />
+                                <UserPlus className="h-6 w-6 text-primary"/>
                                 Регистрация
                             </CardTitle>
                             <CardDescription>Создайте новый аккаунт</CardDescription>
@@ -73,64 +101,71 @@ export default function RegisterPage() {
                                     <FormField
                                         control={form.control}
                                         name="name"
-                                        render={({ field }) => (
+                                        render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Имя</FormLabel>
                                                 <FormControl>
                                                     <div className="relative">
-                                                        <Input placeholder="Введите имя" {...field} className="pl-10" />
-                                                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
+                                                        <Input placeholder="Введите имя" {...field} className="pl-10"/>
+                                                        <User
+                                                            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5"/>
                                                     </div>
                                                 </FormControl>
-                                                <FormMessage />
+                                                <FormMessage/>
                                             </FormItem>
                                         )}
                                     />
                                     <FormField
                                         control={form.control}
                                         name="email"
-                                        render={({ field }) => (
+                                        render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Email</FormLabel>
                                                 <FormControl>
                                                     <div className="relative">
-                                                        <Input placeholder="example@example.com" {...field} className="pl-10" />
-                                                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
+                                                        <Input placeholder="example@example.com" {...field}
+                                                               className="pl-10"/>
+                                                        <Mail
+                                                            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5"/>
                                                     </div>
                                                 </FormControl>
-                                                <FormMessage />
+                                                <FormMessage/>
                                             </FormItem>
                                         )}
                                     />
                                     <FormField
                                         control={form.control}
                                         name="password"
-                                        render={({ field }) => (
+                                        render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Пароль</FormLabel>
                                                 <FormControl>
                                                     <div className="relative">
-                                                        <Input type="password" placeholder="••••••••" {...field} className="pl-10" />
-                                                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
+                                                        <Input type="password" placeholder="••••••••" {...field}
+                                                               className="pl-10"/>
+                                                        <Lock
+                                                            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5"/>
                                                     </div>
                                                 </FormControl>
-                                                <FormMessage />
+                                                <FormMessage/>
                                             </FormItem>
                                         )}
                                     />
                                     <FormField
                                         control={form.control}
                                         name="confirmPassword"
-                                        render={({ field }) => (
+                                        render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Подтвердите пароль</FormLabel>
                                                 <FormControl>
                                                     <div className="relative">
-                                                        <Input type="password" placeholder="••••••••" {...field} className="pl-10" />
-                                                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
+                                                        <Input type="password" placeholder="••••••••" {...field}
+                                                               className="pl-10"/>
+                                                        <Lock
+                                                            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5"/>
                                                     </div>
                                                 </FormControl>
-                                                <FormMessage />
+                                                <FormMessage/>
                                             </FormItem>
                                         )}
                                     />

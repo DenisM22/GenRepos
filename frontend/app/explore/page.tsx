@@ -46,10 +46,10 @@ export default function ExplorePage() {
             <main className="container mx-auto px-4 py-12">
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
                     <h1 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
-                        Узнайте больше о ГенРепозитории
+                        Узнайте больше о GenRepos
                     </h1>
                     <p className="text-xl text-muted-foreground mb-12 max-w-3xl">
-                        ГенРепозиторий - это современный сервис для хранения, организации и исследования генеалогических данных и
+                        GenRepos - это современный сервис для хранения, организации и исследования генеалогических данных и
                         семейной истории. Откройте для себя мощные инструменты для сохранения вашего семейного наследия.
                     </p>
 
@@ -70,7 +70,7 @@ export default function ExplorePage() {
                     </div>
 
                     <section className="mb-12">
-                        <h2 className="text-3xl font-bold mb-4">Как начать работу с ГенРепозиторием</h2>
+                        <h2 className="text-3xl font-bold mb-4">Как начать работу с GenRepos</h2>
                         <ol className="list-decimal list-inside space-y-4 text-lg">
                             <li>Зарегистрируйтесь на платформе, создав личный аккаунт.</li>
                             <li>Начните с добавления основной информации о вашей семье.</li>
@@ -80,19 +80,8 @@ export default function ExplorePage() {
                         </ol>
                     </section>
 
-                    <section className="bg-primary/5 p-8 rounded-lg mb-12">
-                        <h2 className="text-3xl font-bold mb-4">Почему выбирают ГенРепозиторий</h2>
-                        <ul className="list-disc list-inside space-y-2 text-lg">
-                            <li>Интуитивно понятный интерфейс, доступный для пользователей любого уровня.</li>
-                            <li>Надежное хранение данных с регулярным резервным копированием.</li>
-                            <li>Возможность совместной работы с членами семьи над общей родословной.</li>
-                            <li>Постоянные обновления и добавление новых функций.</li>
-                            <li>Поддержка различных форматов документов и медиафайлов.</li>
-                        </ul>
-                    </section>
-
                     <div className="text-center">
-                        <h2 className="text-3xl font-bold mb-4">Готовы начать свое генеалогическое путешествие?</h2>
+                        <h2 className="text-3xl font-bold mb-4">Готовы начать свое путешествие?</h2>
                         <Link href="/register">
                             <Button size="lg" className="text-lg px-8 py-6">
                                 Зарегистрироваться бесплатно
@@ -104,4 +93,3 @@ export default function ExplorePage() {
         </div>
     )
 }
-

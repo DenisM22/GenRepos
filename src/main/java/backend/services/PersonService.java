@@ -3,16 +3,17 @@ package backend.services;
 import backend.dto.PersonDto;
 import backend.dto.PersonFamilyTreeDto;
 import backend.dto.PersonLightDto;
+import backend.filters.PersonFilterStrategy;
 import backend.models.Person;
 import backend.models.references.Gender;
 import backend.repositories.PersonRepository;
+import backend.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -24,36 +25,22 @@ public class PersonService {
 
     private final PersonRepository personRepository;
     private final ModelMapper modelMapper;
+    private final UserRepository userRepository;
+    private final UserService userService;
+    private final List<PersonFilterStrategy> strategies;
 
-    public List<PersonLightDto> getAllPeople(String str, Long uyezdId, Short from, Short to) {
-        List<Person> people;
-        LocalDate dateFrom = LocalDate.of(1, 1, 1);
-        LocalDate dateTo = LocalDate.of(3000, 12, 31);
-
-        if ((str == null || str.isBlank()) && uyezdId == null && from == null && to == null) {
-            people = personRepository.findAll(Sort.by("lastName"));
-        } else if ((str != null && !str.isBlank()) && uyezdId == null && from == null && to == null) {
-            people = personRepository.findAllByFirstNameStartingWithIgnoreCaseOrLastNameStartingWithIgnoreCaseOrderByLastName(str, str);
-        } else {
-            if (from != null)
-                dateFrom = LocalDate.of(from, 1, 1);
-
-            if (to != null)
-                dateTo = LocalDate.of(to, 12, 31);
-
-            if (uyezdId == null) {
-                people = personRepository.findAllByFirstNameStartingWithIgnoreCaseAndBirthDate_ExactDateBetweenOrLastNameStartingWithIgnoreCaseAndBirthDate_ExactDateBetweenOrderByLastName
-                        (str, dateFrom, dateTo, str, dateFrom, dateTo);
-            } else
-                people = personRepository.findAllByFirstNameStartingWithIgnoreCaseAndPlace_Volost_Uyezd_IdAndBirthDate_ExactDateBetweenOrLastNameStartingWithIgnoreCaseAndPlace_Volost_Uyezd_IdAndBirthDate_ExactDateBetweenOrderByLastName
-                        (str, uyezdId, dateFrom, dateTo, str, uyezdId, dateFrom, dateTo);
-        }
+    public List<PersonLightDto> getAllPeople(String str, Gender gender, Long uyezdId, Short from, Short to) {
+        List<Person> people = strategies.stream().filter((s) -> s.isApplicable(str, gender, uyezdId, from, to))
+                .toList().stream().findFirst().orElseThrow(() ->
+                        new IllegalStateException("Подходящая стратегия поиска людей не найдена"))
+                .filter(str, gender, uyezdId, from, to);
 
         return people.stream().map(person -> modelMapper.map(person, PersonLightDto.class)).toList();
     }
 
-    public PersonDto getPersonDtoById(Long id) {
+    public PersonDto getPersonById(Long id) {
         Person person = personRepository.findById(id).orElseThrow(() -> new RuntimeException("Человек не найден"));
+        Hibernate.initialize(person.getPlace());
         return modelMapper.map(person, PersonDto.class);
     }
 
@@ -71,41 +58,45 @@ public class PersonService {
             throw new IllegalArgumentException("Переданный объект person не должен быть null");
         }
 
-        if (person.getFather() != null) {
-            if (Objects.equals(person.getId(), person.getFather().getId())) {
-                throw new IllegalArgumentException("Человек не может быть своим собственным отцом");
+        if (person.getId() != null) {
+            if (person.getFather() != null) {
+                if (Objects.equals(person.getId(), person.getFather().getId())) {
+                    throw new IllegalArgumentException("Человек не может быть своим собственным отцом");
+                }
             }
-        }
 
-        if (person.getMother() != null) {
-            if (Objects.equals(person.getId(), person.getMother().getId())) {
-                throw new IllegalArgumentException("Человек не может быть своей собственной матерью");
+            if (person.getMother() != null) {
+                if (Objects.equals(person.getId(), person.getMother().getId())) {
+                    throw new IllegalArgumentException("Человек не может быть своей собственной матерью");
+                }
             }
-        }
 
-        if (person.getSpouse() != null) {
-            if (Objects.equals(person.getId(), person.getSpouse().getId())) {
-                throw new IllegalArgumentException("Человек не может быть сам себе супругом");
+            if (person.getSpouse() != null) {
+                if (Objects.equals(person.getId(), person.getSpouse().getId())) {
+                    throw new IllegalArgumentException("Человек не может быть сам себе супругом");
+                }
             }
         }
 
         if (person.getFather() != null && person.getMother() != null &&
-                Objects.equals(person.getFather().getId(), person.getMother().getId())) {
+                Objects.equals(person.getFather(), person.getMother())) {
             throw new IllegalArgumentException("Отец и мать не могут быть одним и тем же человеком");
         }
 
         if (person.getFather() != null && person.getSpouse() != null &&
-                Objects.equals(person.getFather().getId(), person.getSpouse().getId())) {
+                Objects.equals(person.getFather(), person.getSpouse())) {
             throw new IllegalArgumentException("Отец и супруг(а) не могут быть одним и тем же человеком");
         }
 
         if (person.getMother() != null && person.getSpouse() != null &&
-                Objects.equals(person.getMother().getId(), person.getSpouse().getId())) {
+                Objects.equals(person.getMother(), person.getSpouse())) {
             throw new IllegalArgumentException("Мать и супруг(а) не могут быть одним и тем же человеком");
         }
     }
 
-    public void savePerson(Person person) {
+    public void savePerson(PersonDto personDto, Boolean me) {
+
+        Person person = modelMapper.map(personDto, Person.class);
 
         validatePerson(person);
 
@@ -138,11 +129,19 @@ public class PersonService {
             person.setChildren(children);
         }
 
-        personRepository.save(person);
+        if (me != null) {
+            Person savedPerson = personRepository.save(person);
+            userRepository.updatePersonId(savedPerson.getUserId(), savedPerson.getId());
+            userService.refreshAuthentication(savedPerson);
+        } else
+            personRepository.save(person);
+
     }
 
     //    @CacheEvict(value = "familyTree", key = "#id")
-    public void editPerson(Long id, Person editedPerson) {
+    public void editPerson(Long id, PersonDto personDto) {
+
+        Person editedPerson = modelMapper.map(personDto, Person.class);
 
         validatePerson(editedPerson);
 

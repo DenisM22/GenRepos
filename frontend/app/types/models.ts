@@ -1,3 +1,12 @@
+export interface User {
+  id?: number
+  username?: string
+  password?: string
+  email?: string
+  person?: Person
+  people?: Person[]
+}
+
 export interface Parish {
   id?: number
   parish?: string
@@ -60,6 +69,7 @@ export interface Person {
   father?: Person
   mother?: Person
   children?: Person[]
+  userId?: number
 }
 
 export interface MetricDocument {

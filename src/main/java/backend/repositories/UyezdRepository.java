@@ -7,6 +7,4 @@ import java.util.List;
 
 public interface UyezdRepository extends JpaRepository<Uyezd, Long> {
 
-    List<Uyezd> findAll();
-
 }

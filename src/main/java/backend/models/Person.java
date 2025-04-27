@@ -67,6 +67,9 @@ public class Person {
     )
     private List<Person> children;
 
+    @JoinColumn(name = "user_id")
+    private Long userId;
+
     public void addChild(Person child) {
         if (children == null) {
             children = new ArrayList<>();
@@ -96,22 +99,23 @@ public class Person {
                 Objects.equals(deathDate, person.deathDate) &&
                 Objects.equals(place, person.place) &&
                 Objects.equals(socialStatus, person.socialStatus) &&
-                Objects.equals(father != null ? father.getId() : null, person.father != null ? person.father.getId() : null) &&
-                Objects.equals(mother != null ? mother.getId() : null, person.mother != null ? person.mother.getId() : null) &&
-                Objects.equals(spouse != null ? spouse.getId() : null, person.spouse != null ? person.spouse.getId() : null) &&
+                Objects.equals(father != null ? father.getId() : null,
+                        person.father != null ? person.father.getId() : null) &&
+                Objects.equals(mother != null ? mother.getId() : null,
+                        person.mother != null ? person.mother.getId() : null) &&
+                Objects.equals(spouse != null ? spouse.getId() : null,
+                        person.spouse != null ? person.spouse.getId() : null) &&
                 Objects.equals(
-                        children.stream().map(Person::getId).toList(),
-                        person.children.stream().map(Person::getId).toList()
+                        !children.isEmpty() ?
+                        children.stream().map(Person::getId).toList() : null,
+                        !children.isEmpty() ?
+                        person.children.stream().map(Person::getId).toList() : null
                 );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstName, lastName, middleName, gender, birthDate, deathDate, place, socialStatus,
-                father != null ? father.getId() : null,
-                mother != null ? mother.getId() : null,
-                spouse != null ? spouse.getId() : null,
-                children.stream().map(Person::getId).toList());
+        return Objects.hash(id);
     }
 
     @Override

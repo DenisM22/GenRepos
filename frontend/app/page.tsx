@@ -37,7 +37,7 @@ export default function Home() {
             <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1/2 h-full hidden lg:block">
               <div className="absolute inset-0 bg-gradient-to-l from-transparent to-background z-10"></div>
               <Image
-                  src="/placeholder.svg?height=800&width=800"
+                  src="tree-main.png"
                   alt="Генеалогическое древо"
                   width={800}
                   height={800}
@@ -111,7 +111,7 @@ export default function Home() {
                     <h2 className="text-2xl md:text-3xl font-bold">Начните исследование</h2>
                   </div>
                   <p className="text-muted-foreground mb-8 text-lg">
-                    Создайте свой первый документ и начните сохранять историю вашей семьи для будущих поколений.
+                    Добавьте свой первый документ и начните сохранять историю вашей семьи для будущих поколений.
                   </p>
                   <Link href="/documents/new">
                     <Button size="lg" className="gap-2 text-base h-12 px-6 group">

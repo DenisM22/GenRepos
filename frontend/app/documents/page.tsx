@@ -12,6 +12,7 @@ import type {Document} from "@/app/types/models";
 import {confessionalDocumentApi, metricDocumentApi, revisionDocumentApi} from "@/app/api/api"
 import {AxiosError} from "axios"
 import {YearRangeFilter} from "@/components/YearRangeFilter"
+import {DocumentCardSkeleton} from "@/components/DocumentCardSkeleton";
 
 const documentTypes = [
     {value: "metric", label: "Метрическая книга"},
@@ -21,6 +22,7 @@ const documentTypes = [
 
 export default function DocumentsPage() {
     const [message, setMessage] = useState('')
+    const [isLoading, setIsLoading] = useState(true)
     const [documents, setDocuments] = useState<Document[]>([])
     const [query, setQuery] = useState("")
 
@@ -30,6 +32,7 @@ export default function DocumentsPage() {
 
     useEffect(() => {
         fetchDocuments()
+        setIsLoading(false)
     }, [selectedType, startYear, endYear]);
 
     const fetchDocuments = async () => {
@@ -130,7 +133,13 @@ export default function DocumentsPage() {
                 {message && <p className="mt-4 text-center text-red-500">{message}</p>}
 
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {documents.map((doc) => (
+                    {isLoading
+                        ?
+                        Array(12)
+                            .fill(0)
+                            .map((_, index) => <DocumentCardSkeleton key={index} />)
+                        :
+                        documents.map((doc) => (
                         <Link href={`/documents/${doc.type}/${doc.id}`} key={doc.id}>
                             <Card className="hover:shadow-md transition-shadow h-full">
                                 <CardHeader className="pb-2">

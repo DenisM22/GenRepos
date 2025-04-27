@@ -65,7 +65,9 @@ CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
     username VARCHAR NOT NULL UNIQUE,
     password VARCHAR NOT NULL,
-    email VARCHAR
+    email VARCHAR,
+--     person_id BIGINT REFERENCES people(id) ON DELETE SET NULL
+    person_id BIGINT
     );
 
 CREATE TABLE IF NOT EXISTS fuzzy_dates (
@@ -85,10 +87,11 @@ CREATE TABLE IF NOT EXISTS people (
     birth_date BIGINT REFERENCES fuzzy_dates(id),
     death_date BIGINT REFERENCES fuzzy_dates(id),
     place_id BIGINT REFERENCES places(id),
-    social_status_id BIGINT REFERENCES places(id),
+    social_status_id BIGINT REFERENCES social_statuses(id),
     father_id BIGINT REFERENCES people(id) ON DELETE SET NULL,
     mother_id BIGINT REFERENCES people(id) ON DELETE SET NULL,
-    spouse_id BIGINT REFERENCES people(id) ON DELETE SET NULL
+    spouse_id BIGINT REFERENCES people(id) ON DELETE SET NULL,
+    user_id BIGINT REFERENCES users(id) ON DELETE CASCADE
     );
 
 CREATE TABLE IF NOT EXISTS parents_children (

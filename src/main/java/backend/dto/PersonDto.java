@@ -24,5 +24,6 @@ public class PersonDto {
     private PersonLightDto father;
     private PersonLightDto mother;
     private List<PersonLightDto> children;
+    private Long userId;
 
 }

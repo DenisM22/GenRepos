@@ -64,7 +64,9 @@ export default function DocumentPage() {
               <div className="flex items-center gap-2">
                 <MapPin className="h-5 w-5 text-muted-foreground" />
                 <span>
-                <strong>Место:</strong> {document.parish?.parish}
+                <strong>Место:</strong> {document.place
+                    ? `${document.place?.volost?.uyezd?.uyezd || "—"} уезд, ${document.place?.volost?.volost || "—"}, ${document.place?.place || "—"}`
+                    : "не указано"}
               </span>
               </div>
               {document.people?.some((person) => person.image) && (

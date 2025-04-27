@@ -11,6 +11,7 @@ import {ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Download, Minus, Plus, Refres
 import {toast} from "@/components/ui/use-toast"
 import type {Person} from "@/app/types/models"
 import {personApi} from "@/app/api/api";
+import {AxiosError} from "axios";
 
 interface FamilyTreeVisualizationProps {
     rootPerson: Person
@@ -37,28 +38,33 @@ export default function FamilyTreePage() {
     useEffect(() => {
         const fetchPersonData = async () => {
             setLoading(true)
+
             try {
-
-                await new Promise((resolve) => setTimeout(resolve, 300)) // Имитация задержки запроса
                 const response = await personApi.getFamilyTree(params.id)
-
                 setRootPerson(response.data)
 
                 // Сбрасываем позицию и масштаб при смене человека
                 setPosition({x: 0, y: 0})
                 setZoom(1)
-            } catch (error) {
-                console.error("Ошибка при загрузке данных:", error)
-                toast({
-                    title: "Ошибка",
-                    description: "Не удалось загрузить данные родословной",
-                    variant: "destructive",
-                })
+            } catch (error: unknown) {
+                if (error instanceof AxiosError) {
+                    console.error(error.response?.data);
+                    toast({
+                        title: "Ошибка при загрузке данных",
+                        description: `${error.response?.data}`,
+                        variant: "destructive",
+                    })
+                } else {
+                    console.error(error);
+                    toast({
+                        title: "Неизвестная ошибка",
+                        variant: "destructive",
+                    })
+                }
             } finally {
                 setLoading(false)
             }
         }
-
         fetchPersonData()
     }, [])
 
@@ -70,20 +76,20 @@ export default function FamilyTreePage() {
             const fileData = response.data;
 
             if (fileData) {
-                const blob = new Blob([fileData], {type: "text/plain"});
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = `Генеалогическое древо ${rootPerson.lastName} ${rootPerson.firstName}.ged`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
+                const blob = new Blob([fileData], {type: "text/plain"})
+                const url = URL.createObjectURL(blob)
+                const a = document.createElement("a")
+                a.href = url
+                a.download = `Генеалогическое древо ${rootPerson.lastName} ${rootPerson.firstName}.ged`
+                document.body.appendChild(a)
+                a.click()
+                document.body.removeChild(a)
+                URL.revokeObjectURL(url)
 
                 toast({
                     title: "Экспорт выполнен",
                     description: "Файл GEDCOM успешно создан и скачан",
-                });
+                })
             } else {
                 throw new Error("Полученные данные пусты");
             }
@@ -188,10 +194,17 @@ export default function FamilyTreePage() {
 
     // Обработчик изменения количества поколений
     const handleGenerationsChange = (type: "ancestors" | "descendants", value: number[]) => {
-        setGenerations((prev) => ({
-            ...prev,
-            [type]: value[0],
-        }))
+        if (value[0] > 3) {
+            toast({
+                title: "Большее количество поколений недоступно",
+                description: "Функция находится в разработке",
+                variant: "info",
+            })
+        } else
+            setGenerations((prev) => ({
+                ...prev,
+                [type]: value[0],
+            }))
     }
 
     if (loading) {
@@ -355,7 +368,7 @@ export default function FamilyTreePage() {
                                             <Slider
                                                 value={[generations.descendants]}
                                                 min={0}
-                                                max={5}
+                                                max={3}
                                                 step={1}
                                                 className="w-32"
                                                 onValueChange={(value) => handleGenerationsChange("descendants", value)}
@@ -482,8 +495,9 @@ const renderFamilyLines = (
     const lines: React.JSX.Element[] = []
 
     // Расстояние между поколениями и людьми
-    const generationHeight = (generations.ancestors < 3 && generations.descendants < 3) ? 110 : 150;
-    const personWidth = (generations.ancestors < 3 && generations.descendants < 3) ? 220 : 440;
+    const generationHeight = 110
+    const personWidth = 340
+    let scale = 0.25
 
     // Определяем координаты текущего человека
     let x = centerX
@@ -506,7 +520,8 @@ const renderFamilyLines = (
         // Для детей распределяем по горизонтали
         if (person.children && person.children.length > 0) {
             const childCount = person.children.length
-            const totalWidth = (childCount - 1) * personWidth
+            const levelScale = Math.pow(scale, level)
+            const totalWidth = (childCount - 1) * personWidth * levelScale
 
             // Если это первый уровень потомков, центрируем относительно корня
             if (level === 1) {
@@ -517,13 +532,13 @@ const renderFamilyLines = (
 
     // Если это корневой человек и у него есть супруг(а), добавляем линию связи между ними
     if (level === 0 && person.spouse) {
-        const spouseX = x + personWidth * 1.2
+        const spouseX = x + 250
         lines.push(
             <line
                 key={`line-${person.id}-spouse`}
-                x1={x + 80} // Правая сторона карточки человека
+                x1={x + 70} // Правая сторона карточки человека
                 y1={y}
-                x2={spouseX - 80} // Левая сторона карточки супруга
+                x2={spouseX - 70} // Левая сторона карточки супруга
                 y2={y}
                 stroke="#9333ea" // Фиолетовый цвет для брачной связи
                 strokeWidth="2"
@@ -574,7 +589,8 @@ const renderFamilyLines = (
     // Рисуем линии к детям, если есть и если не превышен лимит поколений потомков
     if (person.children && person.children.length > 0 && level < generations.descendants) {
         const childCount = person.children.length
-        const totalWidth = (childCount - 1) * personWidth
+        const levelScale = Math.pow(0.5, level)
+        const totalWidth = (childCount - 1) * personWidth * levelScale
         let startX = x - totalWidth / 2
 
         // Если это первый уровень, центрируем детей относительно родителя
@@ -612,7 +628,7 @@ const renderFamilyLines = (
 
         // Рекурсивно рисуем линии для каждого ребенка
         person.children.forEach((child, index) => {
-            const childX = startX + index * personWidth
+            const childX = startX + index * personWidth * levelScale
             const childY = y + generationHeight
 
             // Рисуем вертикальную линию от горизонтальной линии к ребенку
@@ -648,11 +664,15 @@ const renderFamilyLines = (
 
     // Рисуем линии к родителям, если есть и если не превышен лимит поколений предков
     if (level > -generations.ancestors) {
-        // Проверяем, есть ли оба родителя
+
+        const baseOffset = 100
+        const levelDepth = Math.abs(level)
+        const parentOffset = baseOffset * Math.pow(scale, levelDepth - 1)
+
         if (person.father && person.mother) {
-            const fatherX = x - personWidth / 2
+            const fatherX = x - parentOffset
             const fatherY = y - generationHeight
-            const motherX = x + personWidth / 2
+            const motherX = x + parentOffset
             const motherY = y - generationHeight
 
             // Общая точка соединения для обоих родителей
@@ -732,7 +752,7 @@ const renderFamilyLines = (
         }
         // Если есть только отец
         else if (person.father) {
-            const fatherX = x - personWidth / 2
+            const fatherX = x - parentOffset / 2
             const fatherY = y - generationHeight
 
             // Рисуем прямую линию от текущего человека к отцу
@@ -764,7 +784,7 @@ const renderFamilyLines = (
         }
         // Если есть только мать
         else if (person.mother) {
-            const motherX = x + personWidth / 2
+            const motherX = x + parentOffset / 2
             const motherY = y - generationHeight
 
             // Рисуем прямую линию от текущего человека к матери
@@ -811,8 +831,9 @@ const renderFamilyNodes = (
     const nodes: React.JSX.Element[] = []
 
     // Расстояние между поколениями и людьми
-    const generationHeight = (generations.ancestors < 3 && generations.descendants < 3) ? 110 : 150;
-    const personWidth = (generations.ancestors < 3 && generations.descendants < 3) ? 220 : 440;
+    const generationHeight = 110
+    const personWidth = 340
+    let scale = 0.25
 
     // Определяем координаты текущего человека
     let x = centerX
@@ -834,8 +855,10 @@ const renderFamilyNodes = (
 
         // Для детей распределяем по горизонтали
         if (person.children && person.children.length > 0) {
+
             const childCount = person.children.length
-            const totalWidth = (childCount - 1) * personWidth
+            const levelScale = Math.pow(scale, level)
+            const totalWidth = (childCount - 1) * personWidth * levelScale
 
             // Если это первый уровень потомков, центрируем относительно корня
             if (level === 1) {
@@ -846,7 +869,7 @@ const renderFamilyNodes = (
 
     // Добавляем узел текущего человека
     nodes.push(
-        <foreignObject key={`node-${person.id}`} x={x - 80} y={y - 30} width="160" height="60">
+        <foreignObject key={`node-${person.id}`} x={x - 70} y={y - 30} width="140" height="60">
             <div
                 className={`
           flex flex-col p-2 rounded-md border shadow-sm w-full h-full overflow-hidden
@@ -886,7 +909,7 @@ const renderFamilyNodes = (
                     {person.lastName} {person.firstName}
                 </div>
                 <div className="text-[8px] text-muted-foreground">
-                    {person.birthDate?.exactDate} {person.birthDate?.exactDate}
+                    {person.birthDate?.exactDate} {person.deathDate?.exactDate}
                 </div>
             </div>
         </foreignObject>,
@@ -894,9 +917,9 @@ const renderFamilyNodes = (
 
     // Добавляем узел супруга, если есть (только для корневого человека)
     if (level === 0 && person.spouse) {
-        const spouseX = x + personWidth * 1.2
+        const spouseX = x + 250
         nodes.push(
-            <foreignObject key={`node-${person.id}-spouse`} x={spouseX - 80} y={y - 30} width="160" height="60">
+            <foreignObject key={`node-${person.id}-spouse`} x={spouseX - 70} y={y - 30} width="140" height="60">
                 <div
                     className={`
             flex flex-col p-2 rounded-md border shadow-sm w-full h-full overflow-hidden
@@ -933,7 +956,8 @@ const renderFamilyNodes = (
     // Рекурсивно добавляем узлы детей, если есть и если не превышен лимит поколений потомков
     if (person.children && person.children.length > 0 && level < generations.descendants) {
         const childCount = person.children.length
-        const totalWidth = (childCount - 1) * personWidth
+        const levelScale = Math.pow(0.5, level)
+        const totalWidth = (childCount - 1) * personWidth * levelScale
         let startX = x - totalWidth / 2
 
         // Если это первый уровень, центрируем детей относительно родителя
@@ -942,7 +966,7 @@ const renderFamilyNodes = (
         }
 
         person.children.forEach((child, index) => {
-            const childX = startX + index * personWidth
+            const childX = startX + index * personWidth * levelScale
             const childY = y + generationHeight
 
             nodes.push(
@@ -960,15 +984,20 @@ const renderFamilyNodes = (
 
     // Рекурсивно добавляем узлы родителей, если есть и если не превышен лимит поколений предков
     if (level > -generations.ancestors) {
+
+        const baseOffset = 100
+        const levelDepth = Math.abs(level)
+        const parentOffset = baseOffset * Math.pow(scale, levelDepth - 1)
+
         if (person.father) {
-            const fatherX = x - personWidth / 2
+            const fatherX = x - parentOffset
             const fatherY = y - generationHeight
 
             nodes.push(...renderFamilyNodes(person.father as Person, fatherX, fatherY, generations, level - 1, "left"))
         }
 
         if (person.mother) {
-            const motherX = x + personWidth / 2
+            const motherX = x + parentOffset
             const motherY = y - generationHeight
 
             nodes.push(...renderFamilyNodes(person.mother as Person, motherX, motherY, generations, level - 1, "right"))

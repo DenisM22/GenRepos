@@ -212,13 +212,18 @@ export default function EditPerson() {
                         response = await autocompleteApi.getMiddleNames(value);
                         break;
                     case "spouse":
+                        response = await personApi.getAll(value);
+                        break;
                     case "father":
+                        response = await personApi.getAll(value, "MALE");
+                        break;
                     case "mother":
+                        response = await personApi.getAll(value, "FEMALE");
+                        break;
                     case "children":
                         response = await personApi.getAll(value);
                         break;
                 }
-
                 setSuggestions((prev) => ({...prev, [field]: response?.data || []}));
             } catch (error) {
                 console.error(`Ошибка загрузки ${field}:`, error);
@@ -226,7 +231,8 @@ export default function EditPerson() {
         } else {
             setSuggestions((prev) => ({...prev, [field]: []}));
         }
-    }, []);
+    }, [])
+
     const renderSuggestionInput = (field: keyof Person, label: string, label2: string) => {
         const value = person[field] as string;
 

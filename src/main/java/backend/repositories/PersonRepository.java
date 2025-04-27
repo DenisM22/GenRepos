@@ -1,6 +1,7 @@
 package backend.repositories;
 
 import backend.models.Person;
+import backend.models.references.Gender;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,6 +13,12 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
 
     List<Person> findAllByFirstNameStartingWithIgnoreCaseOrLastNameStartingWithIgnoreCaseOrderByLastName
             (String firstName, String lastName);
+
+    List<Person> findAllByFirstNameStartingWithIgnoreCaseAndGenderOrLastNameStartingWithIgnoreCaseAndGenderOrderByLastName
+            (String firstName, Gender gender, String lastName, Gender gender2);
+
+    List<Person> findAllByFirstNameStartingWithIgnoreCaseAndPlace_Volost_Uyezd_IdOrLastNameStartingWithIgnoreCaseAndPlace_Volost_Uyezd_IdOrderByLastName
+            (String firstName, Long place_volost_uyezd_id, String lastName, Long place_volost_uyezd_id2);
 
     List<Person> findAllByFirstNameStartingWithIgnoreCaseAndBirthDate_ExactDateBetweenOrLastNameStartingWithIgnoreCaseAndBirthDate_ExactDateBetweenOrderByLastName
             (String firstName, LocalDate birthDate_exactDate, LocalDate birthDate_exactDate2, String lastName, LocalDate birthDate_exactDate3, LocalDate birthDate_exactDate4);

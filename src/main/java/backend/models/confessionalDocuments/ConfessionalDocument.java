@@ -22,7 +22,7 @@ public class ConfessionalDocument {
     @Column(name = "created_at")
     private Short createdAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parish_id")
     private Parish parish;
 

@@ -20,8 +20,10 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 import {toast} from "@/components/ui/use-toast"
+import useUserData from "@/components/useUserData";
 
 export default function PersonPage() {
+    const user = useUserData()
     const params = useParams()
     const router = useRouter()
     const [person, setPerson] = useState<Person | null>(null)
@@ -37,7 +39,7 @@ export default function PersonPage() {
                 console.error(error.response?.data);
                 toast({
                     title: "Ошибка при загрузке человека",
-                    description: `${error.response?.data?.message || error.message}`,
+                    description: `${error.response?.data}`,
                     variant: "destructive",
                 })
             } else {
@@ -48,7 +50,7 @@ export default function PersonPage() {
                 })
             }
         }
-    };
+    }
 
     useEffect(() => {
         fetchPerson()
@@ -100,34 +102,34 @@ export default function PersonPage() {
             <Header/>
             <main className="container mx-auto px-4 py-12">
                 <Card className="mb-8">
-
                     <CardHeader className="flex flex-row items-center justify-between">
                         <CardTitle className="text-3xl flex items-center gap-2">
                             <User className="h-8 w-8 text-primary"/>
                             {person.lastName} {person.firstName} {person.middleName}
                         </CardTitle>
-                        <div className="flex gap-2">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setDeleteDialogOpen(true)}
-                                className="flex items-center gap-2"
-                            >
-                                <Trash2 className="h-4 w-4"/>
-                                Удалить
-                            </Button>
+                        {user?.id == person?.userId && (
+                            <div className="flex gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setDeleteDialogOpen(true)}
+                                    className="flex items-center gap-2"
+                                >
+                                    <Trash2 className="h-4 w-4"/>
+                                    Удалить
+                                </Button>
 
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => router.push(`/people/${params.id}/edit`)}
-                                className="flex items-center gap-2"
-                            >
-                                <Edit className="h-4 w-4"/>
-                                Редактировать
-                            </Button>
-
-                        </div>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => router.push(`/people/${params.id}/edit`)}
+                                    className="flex items-center gap-2"
+                                >
+                                    <Edit className="h-4 w-4"/>
+                                    Редактировать
+                                </Button>
+                            </div>
+                        )}
                     </CardHeader>
 
 

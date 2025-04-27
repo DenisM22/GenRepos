@@ -1,11 +1,15 @@
 package backend.controllers;
 
+import backend.dto.PersonDto;
 import backend.models.Person;
+import backend.models.User;
+import backend.models.references.Gender;
 import backend.services.GedcomService;
 import backend.services.PersonService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -19,30 +23,31 @@ public class PersonController {
 
     @GetMapping("/get-all")
     public ResponseEntity<?> getAllPeople(@RequestParam(name = "str", required = false) String str,
+                                          @RequestParam(name = "gender", required = false) Gender gender,
                                           @RequestParam(name = "uyezdId", required = false) Long uyezdId,
                                           @RequestParam(name = "from", required = false) Short from,
                                           @RequestParam(name = "to", required = false) Short to) {
         log.info("Отправлен запрос на получение всех людей");
-        return ResponseEntity.ok(personService.getAllPeople(str, uyezdId, from, to));
+        return ResponseEntity.ok(personService.getAllPeople(str, gender, uyezdId, from, to));
     }
 
     @GetMapping("/get/{id}")
     public ResponseEntity<?> getPersonById(@PathVariable Long id) {
         log.info("Отправлен запрос на получение человека с id {}", id);
-        return ResponseEntity.ok().body(personService.getPersonDtoById(id));
+        return ResponseEntity.ok().body(personService.getPersonById(id));
     }
 
     @PostMapping("/save")
-    public ResponseEntity<?> savePerson(@RequestBody Person person) {
+    public ResponseEntity<?> savePerson(@RequestParam(required = false) Boolean me, @RequestBody PersonDto personDto) {
         log.info("Отправлен запрос на сохранение нового человека");
-        personService.savePerson(person);
+        personService.savePerson(personDto, me);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/edit/{id}")
-    public ResponseEntity<?> editPerson(@PathVariable Long id, @RequestBody Person person) {
+    public ResponseEntity<?> editPerson(@PathVariable Long id, @RequestBody PersonDto personDto) {
         log.info("Отправлен запрос на редактирование человека с id {}", id);
-        personService.editPerson(id, person);
+        personService.editPerson(id, personDto);
         return ResponseEntity.ok().build();
     }
 

@@ -1,6 +1,6 @@
 "use client"
 
-import {useEffect, useState} from "react"
+import React, {useEffect, useState} from "react"
 import Link from "next/link"
 import {Button} from "@/components/ui/button"
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
@@ -12,6 +12,7 @@ import type {Person} from "@/app/types/models"
 import {personApi} from "@/app/api/api"
 import {AxiosError} from "axios"
 import {YearRangeFilter} from "@/components/YearRangeFilter"
+import {DocumentCardSkeleton} from "@/components/DocumentCardSkeleton";
 
 const uyezdOptions = [
     {value: "1", label: "Вельский"},
@@ -28,26 +29,28 @@ const uyezdOptions = [
 
 export default function PeoplePage() {
     const [message, setMessage] = useState('')
+    const [isLoading, setIsLoading] = useState(true)
     const [people, setPeople] = useState<Person[]>([])
     const [query, setQuery] = useState("")
 
-    const [selectedUyezd, setSelectedUyezd] = useState<number>()
-    const [startBirthYear, setStartBirthYear] = useState<number>()
-    const [endBirthYear, setEndBirthYear] = useState<number>()
+    const [selectedUyezd, setSelectedUyezd] = useState<string | null>()
+    const [startBirthYear, setStartBirthYear] = useState<string | null>()
+    const [endBirthYear, setEndBirthYear] = useState<string | null>()
 
     useEffect(() => {
         fetchPeople()
+        setIsLoading(false)
     }, [selectedUyezd, startBirthYear, endBirthYear]);
 
     const fetchPeople = async () => {
         try {
             setMessage('')
-            const response = await personApi.getAll(query, selectedUyezd, startBirthYear, endBirthYear)
+            const response = await personApi.getAll(query, null, selectedUyezd, startBirthYear, endBirthYear)
             setPeople(response.data)
         } catch (error: unknown) {
             if (error instanceof AxiosError) {
                 console.error(error.response?.data);
-                setMessage('Ошибка при загрузке людей: ' + (error.response?.data?.message || error.message));
+                setMessage('Ошибка при загрузке людей: ' + (error.response?.data || error.message));
             } else {
                 console.error(error);
                 setMessage('Неизвестная ошибка');
@@ -103,7 +106,13 @@ export default function PeoplePage() {
                 {message && <p className="mt-4 text-center text-red-500">{message}</p>}
 
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {people.map((person) => (
+                    {isLoading
+                        ?
+                        Array(12)
+                            .fill(0)
+                            .map((_, index) => <DocumentCardSkeleton key={index} />)
+                        :
+                        people.map((person) => (
                         <Link href={`/people/${person.id}`} key={person.id}>
                             <Card className="hover:shadow-md transition-shadow h-full">
                                 <CardHeader className="pb-2">
@@ -124,7 +133,7 @@ export default function PeoplePage() {
                                                     ) : person.birthDate.description === "Точная дата" ? (
                                                         person.birthDate.exactDate
                                                     ) : (
-                                                        person?.birthDate?.description.toLowerCase() + " " + person.birthDate.exactDate
+                                                        person?.birthDate?.description?.toLowerCase() + " " + person.birthDate.exactDate
                                                     )
                                                 ) : (
                                                     "не указана"

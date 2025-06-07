@@ -1,15 +1,12 @@
 package backend.controllers;
 
 import backend.dto.PersonDto;
-import backend.models.Person;
-import backend.models.User;
 import backend.models.references.Gender;
 import backend.services.GedcomService;
 import backend.services.PersonService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -38,7 +35,7 @@ public class PersonController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<?> savePerson(@RequestParam(required = false) Boolean me, @RequestBody PersonDto personDto) {
+    public ResponseEntity<?> savePerson(@RequestParam Boolean me, @RequestBody PersonDto personDto) {
         log.info("Отправлен запрос на сохранение нового человека");
         personService.savePerson(personDto, me);
         return ResponseEntity.ok().build();

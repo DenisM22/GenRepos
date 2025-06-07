@@ -7,9 +7,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @Slf4j
 @ControllerAdvice
 public class GeneralExceptionHandler {
@@ -25,13 +22,12 @@ public class GeneralExceptionHandler {
 
         StringBuilder errors = new StringBuilder();
 
-        e.getBindingResult().getFieldErrors().forEach(error -> {
-            errors.append(error.getDefaultMessage()).append("; ");
-        });
+        e.getBindingResult().getFieldErrors().forEach(error ->
+                errors.append(error.getDefaultMessage()).append("; "));
         errors.delete(errors.length() - 2, errors.length());
 
         log.error(errors.toString());
-        return ResponseEntity.badRequest().body(errors.toString());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors.toString());
     }
 
 }

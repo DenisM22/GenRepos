@@ -1,8 +1,9 @@
 package backend.models.references;
 
 import jakarta.persistence.*;
-import lombok.*;
-import org.springframework.boot.context.properties.bind.Name;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -10,7 +11,12 @@ import java.util.List;
 @Table(name = "first_names")
 @Getter
 @Setter
+@NoArgsConstructor
 public class FirstName {
+
+    public FirstName(String firstName) {
+        this.firstName = firstName;
+    }
 
     @Id
     private String firstName;
@@ -18,4 +24,3 @@ public class FirstName {
     @OneToMany(mappedBy = "firstName", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Alias> aliases;
 }
-

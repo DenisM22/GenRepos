@@ -37,14 +37,14 @@ public class UserService implements UserDetailsService {
         return getUserByUsername(username);
     }
 
-    public void saveUser(UserDto user) {
-        if (userRepository.findByUsername(user.getUsername()).isPresent())
+    public void saveUser(UserDto userDto) {
+        if (userRepository.findByUsername(userDto.getUsername()).isPresent())
             throw new IllegalArgumentException("Пользователь с таким именем уже существует");
 
         User newUser = new User();
-        newUser.setUsername(user.getUsername());
-        newUser.setPassword(passwordEncoder.encode(user.getPassword()));
-        newUser.setEmail(user.getEmail());
+        newUser.setUsername(userDto.getUsername());
+        newUser.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        newUser.setEmail(userDto.getEmail());
 
         userRepository.save(newUser);
     }
@@ -82,6 +82,5 @@ public class UserService implements UserDetailsService {
 
         SecurityContextHolder.getContext().setAuthentication(newAuth);
     }
-
 
 }

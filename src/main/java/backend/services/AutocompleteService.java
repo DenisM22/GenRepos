@@ -3,10 +3,12 @@ package backend.services;
 import backend.models.references.*;
 import backend.repositories.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AutocompleteService {
@@ -23,7 +25,7 @@ public class AutocompleteService {
     private final FamilyStatusRepository familyStatusRepository;
     private final LandownerRepository landownerRepository;
 
-    public List<String> getFirstNamesStartingWith(String str) { //TODO добавить синонимы
+    public List<String> getFirstNamesStartingWith(String str) {
         List<FirstName> list = firstNameRepository.findAllByFirstNameStartingWithIgnoreCase(str);
         return list.stream().map(FirstName::getFirstName).toList();
     }

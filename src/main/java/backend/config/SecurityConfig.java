@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.http.Rfc6265CookieProcessor;
 import org.springframework.boot.web.embedded.tomcat.TomcatContextCustomizer;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -80,9 +79,9 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout
                         .logoutUrl("/user/logout")
-                        .logoutSuccessHandler((request, response, authentication) -> {
-                            response.setStatus(HttpServletResponse.SC_OK);
-                        })
+                        .logoutSuccessHandler(
+                                (request, response, authentication)
+                                        -> response.setStatus(HttpServletResponse.SC_OK))
                         .deleteCookies("JSESSIONID")
                         .invalidateHttpSession(true)
                 )
@@ -91,14 +90,15 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public TomcatContextCustomizer sameSiteCookieCustomizer() {
-        return context -> {
-            Rfc6265CookieProcessor cookieProcessor = new Rfc6265CookieProcessor();
-            cookieProcessor.setSameSiteCookies("None");
-            context.setCookieProcessor(cookieProcessor);
-        };
-    }
+    //Куки для деплоя на рендер
+//    @Bean
+//    public TomcatContextCustomizer sameSiteCookieCustomizer() {
+//        return context -> {
+//            Rfc6265CookieProcessor cookieProcessor = new Rfc6265CookieProcessor();
+//            cookieProcessor.setSameSiteCookies("None");
+//            context.setCookieProcessor(cookieProcessor);
+//        };
+//    }
 
 //    @Bean
 //    public CorsFilter corsFilter() {

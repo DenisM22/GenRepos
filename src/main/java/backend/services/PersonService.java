@@ -129,7 +129,7 @@ public class PersonService {
             person.setChildren(children);
         }
 
-        if (me != null) {
+        if (me) {
             Person savedPerson = personRepository.save(person);
             userRepository.updatePersonId(savedPerson.getUserId(), savedPerson.getId());
             userService.refreshAuthentication(savedPerson);
@@ -237,6 +237,7 @@ public class PersonService {
         if (!personRepository.existsById(id)) {
             throw new RuntimeException("Человек не найден");
         }
+
         personRepository.deleteById(id);
     }
 

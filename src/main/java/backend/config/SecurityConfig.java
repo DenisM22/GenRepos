@@ -4,8 +4,6 @@ import backend.services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.http.Rfc6265CookieProcessor;
-import org.springframework.boot.web.embedded.tomcat.TomcatContextCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -42,7 +40,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/person/get-all", "/person/get/*", "/document/confessional/get-all",
                                 "/document/confessional/get/*", "/document/metric/get-all", "/document/metric/get/*",
-                                "/document/revision/get-all", "/document/revision/get/*", "/user/register").permitAll()
+                                "/document/revision/get-all", "/document/revision/get/*", "/user/register",
+                                "/actuator/*", "/metrics/*").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception

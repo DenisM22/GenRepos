@@ -3,7 +3,7 @@
 import {useRouter, useSearchParams} from "next/navigation"
 import Link from "next/link"
 import {motion} from "framer-motion"
-import {Lock, LogIn, Mail, User} from "lucide-react"
+import {Lock, LogIn, User} from "lucide-react"
 import {useForm} from "react-hook-form"
 import {zodResolver} from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -27,7 +27,7 @@ type LoginFormValues = z.infer<typeof loginSchema>
 export default function Page() {
     return (
         <Suspense fallback={<div>Загрузка...</div>}>
-            <LoginPage />
+            <LoginPage/>
         </Suspense>
     );
 }

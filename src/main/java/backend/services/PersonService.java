@@ -9,6 +9,7 @@ import backend.models.references.Gender;
 import backend.repositories.PersonRepository;
 import backend.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -18,9 +19,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class PersonService {
 
     private final PersonRepository personRepository;
@@ -29,6 +30,7 @@ public class PersonService {
     private final UserService userService;
     private final List<PersonFilterStrategy> strategies;
 
+    @Transactional
     public List<PersonLightDto> getAllPeople(String str, Gender gender, Long uyezdId, Short from, Short to) {
         List<Person> people = strategies.stream().filter((s) -> s.isApplicable(str, gender, uyezdId, from, to))
                 .toList().stream().findFirst().orElseThrow(() ->
@@ -38,6 +40,7 @@ public class PersonService {
         return people.stream().map(person -> modelMapper.map(person, PersonLightDto.class)).toList();
     }
 
+    @Transactional
     public PersonDto getPersonById(Long id) {
         Person person = personRepository.findById(id).orElseThrow(() -> new RuntimeException("Человек не найден"));
         Hibernate.initialize(person.getPlace());
@@ -94,8 +97,8 @@ public class PersonService {
         }
     }
 
+    @Transactional
     public void savePerson(PersonDto personDto, Boolean me) {
-
         Person person = modelMapper.map(personDto, Person.class);
 
         validatePerson(person);
@@ -129,16 +132,16 @@ public class PersonService {
             person.setChildren(children);
         }
 
-        if (me) {
+        if (me != null && me) {
             Person savedPerson = personRepository.save(person);
             userRepository.updatePersonId(savedPerson.getUserId(), savedPerson.getId());
             userService.refreshAuthentication(savedPerson);
         } else
             personRepository.save(person);
-
     }
 
     //    @CacheEvict(value = "familyTree", key = "#id")
+    @Transactional
     public void editPerson(Long id, PersonDto personDto) {
 
         Person editedPerson = modelMapper.map(personDto, Person.class);
@@ -233,6 +236,7 @@ public class PersonService {
     }
 
     //    @CacheEvict(value = "familyTree", key = "#id")
+    @Transactional
     public void deletePerson(Long id) {
         if (!personRepository.existsById(id)) {
             throw new RuntimeException("Человек не найден");
@@ -242,6 +246,7 @@ public class PersonService {
     }
 
     //    @Cacheable(value = "familyTree", key = "#id")
+    @Transactional
     public PersonFamilyTreeDto getFamilyTree(Long id) {
         Person person = personRepository.findById(id).orElseThrow(() -> new RuntimeException("Человек не найден"));
         return modelMapper.map(person, PersonFamilyTreeDto.class);
